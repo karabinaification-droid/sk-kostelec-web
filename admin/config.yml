@@ -17,3 +17,16 @@ collections:
       - { label: "Kategorie", name: "category", widget: "select", options: ["A-Tým", "Mládež", "Klub"] }
       - { label: "Úvodní fotka", name: "image", widget: "image" }
       - { label: "Text článku", name: "body", widget: "markdown" }
+
+  - name: "tabulka"
+    label: "Tabulka výsledků"
+    folder: "_data/table" # Sem se uloží data o týmech jako JSON
+    create: true
+    extension: "json"
+    format: "json"
+    slug: "{{slug}}"
+    fields:
+      - { label: "Název týmu", name: "title", widget: "string" }
+      - { label: "Pořadí (#)", name: "rank", widget: "number" }
+      - { label: "Zápasy", name: "matches", widget: "number" }
+      - { label: "Body", name: "points", widget: "number" }
