@@ -132,7 +132,6 @@
       async function loadNews() {
         const feed = document.getElementById('news-feed');
         try {
-          // Načtení seznamu souborů ze složky _posts na tvém GitHubu
           const response = await fetch('https://api.github.com/repos/karabinaification-droid/sk-kostelec-web/contents/_posts');
           const files = await response.json();
           
@@ -141,34 +140,31 @@
             return;
           }
 
-          feed.innerHTML = ''; // Vymazat načítací text
+          feed.innerHTML = ''; 
 
-          // Projdeme soubory od nejnovějšího (reverse)
           for (const file of files.reverse()) {
             const res = await fetch(file.download_url);
             const content = await res.text();
             
-            // Rozdělení souboru (YAML hlavička vs text)
             const parts = content.split('---');
             const meta = parts[1];
             const body = parts[2];
             
-            // Vytažení dat pomocí regulárních výrazů
-            const titleMatch = meta.match(/title: "(.*)"/);
-            const dateMatch = meta.match(/date: (.*)/);
-            const imgMatch = meta.match(/image: (.*)/);
+            // OPRAVENO: Chytřejší regulární výrazy pro title, date a image
+            const titleMatch = meta.match(/title:\s*["']?(.*?)["']?$/m);
+            const dateMatch = meta.match(/date:\s*(.*)$/m);
+            const imgMatch = meta.match(/image:\s*["']?(.*?)["']?$/m);
             
-            const title = titleMatch ? titleMatch[1] : 'Bez názvu';
-            const date = dateMatch ? new Date(dateMatch[1]).toLocaleDateString('cs-CZ') : '';
-            const img = imgMatch ? imgMatch[1].replace(/"/g, '') : 'https://via.placeholder.com/150';
+            const title = titleMatch ? titleMatch[1].trim() : 'Bez názvu';
+            const date = dateMatch ? new Date(dateMatch[1].trim()).toLocaleDateString('cs-CZ') : '';
+            const img = imgMatch ? imgMatch[1].trim().replace(/"/g, '') : 'https://via.placeholder.com/150';
 
-            // Vygenerování HTML pro každý článek
             feed.innerHTML += `
               <article class="article-row">
                 <div class="art-img" style="background-image: url('${img}');"></div>
                 <div class="art-text">
                     <span class="date">${date}</span>
-                    <h3>${title}</h3>
+                    <h3 style="color: #0033ff;">${title}</h3>
                     <p>${marked.parse(body.substring(0, 160))}...</p>
                 </div>
               </article>
@@ -179,7 +175,6 @@
           feed.innerHTML = '<p>Nepodařilo se načíst články. Zkontrolujte prosím připojení.</p>';
         }
       }
-      // Spuštění funkce po načtení stránky
       loadNews();
     </script>
 
