@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SK Kostelec nad Černými lesy | Oficiální stránky</title>
+    <title>SK Kostelec nad Cernymi lesy</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -167,7 +167,7 @@
               const sorted = Object.values(stats).sort((a,b) => b.b - a.b || (b.gf-b.ga)-(a.gf-a.ga));
               tb.innerHTML = '';
               sorted.forEach((t, i) => {
-                  const isK = t.title.includes("Kostelec nad Černými lesy") ? 'class="highlight-kostelec"' : '';
+                  const isK = t.title.includes("Kostelec") ? 'class="highlight-kostelec"' : '';
                   tb.innerHTML += `<tr ${isK}><td>${i+1}.</td><td style="text-align:left"><img src="${t.logo}">${t.title}</td><td>${t.z}</td><td>${t.v}-${t.r}-${t.p}</td><td>${t.gf}:${t.ga}</td><td>${t.b}</td></tr>`;
               });
           } catch(e) { tb.innerHTML = 'Tabulka není k dispozici.'; }
