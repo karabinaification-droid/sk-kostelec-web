@@ -18,7 +18,8 @@
         .highlight-kostelec { background-color: #fff4b3 !important; font-weight: bold; }
         .league-table img { width: 22px; height: 22px; object-fit: contain; vertical-align: middle; margin-right: 8px; }
         .roster-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; margin: 30px 0; }
-        .player-card { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; border-bottom: 5px solid #0033ff; text-align: center; }
+        .player-card { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; border-bottom: 5px solid #0033ff; text-align: center; transition: 0.3s; }
+        .player-card:hover { transform: translateY(-5px); }
         .player-img { width: 100%; height: 280px; object-fit: cover; background: #f0f0f0; }
         .p-info { padding: 15px; }
         .p-number { font-size: 1.5rem; font-weight: 900; color: #0033ff; display: block; }
@@ -114,9 +115,11 @@
                   const r = await fetch(file.download_url);
                   const content = await r.text();
                   const meta = content.split('---')[1];
-                  const title = meta.match(/title:\s*["']?(.*?)["']?$/m)[1];
-                  const img = meta.match(/image:\s*["']?(.*?)["']?$/m)[1];
-                  feed.innerHTML += `<article class="article-row"><div class="art-img" style="background-image: url('${img}')"></div><div class="art-text"><h3>${title}</h3></div></article>`;
+                  const titleMatch = meta.match(/title:\s*["']?(.*?)["']?$/m);
+                  const imgMatch = meta.match(/image:\s*["']?(.*?)["']?$/m);
+                  if (titleMatch && imgMatch) {
+                    feed.innerHTML += `<article class="article-row"><div class="art-img" style="background-image: url('${imgMatch[1]}')"></div><div class="art-text"><h3>${titleMatch[1]}</h3></div></article>`;
+                  }
               }
           } catch(e) {}
       }
@@ -154,10 +157,10 @@
                   const h = stats[m.home_id], a = stats[m.away_id];
                   if (h && a) {
                       h.z++; a.z++;
-                      h.gf += m.home_score; h.ga += m.away_score;
-                      a.gf += m.away_score; a.ga += m.home_score;
-                      if (m.home_score > m.away_score) { h.v++; h.b += 3; a.p++; }
-                      else if (m.home_score < m.away_score) { a.v++; a.b += 3; h.p++; }
+                      h.gf += parseInt(m.home_score); h.ga += parseInt(m.away_score);
+                      a.gf += parseInt(m.away_score); a.ga += parseInt(m.home_score);
+                      if (parseInt(m.home_score) > parseInt(m.away_score)) { h.v++; h.b += 3; a.p++; }
+                      else if (parseInt(m.home_score) < parseInt(m.away_score)) { a.v++; a.b += 3; h.p++; }
                       else { h.r++; a.r++; h.b += 1; a.b += 1; }
                   }
               }
