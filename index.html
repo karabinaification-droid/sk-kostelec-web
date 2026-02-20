@@ -98,11 +98,20 @@
     <script>
       const REPO = 'karabinaification-droid/sk-kostelec-web';
 
-      async function init() {
-          await loadNews();
-          await loadNextMatch();
-          await generateTable();
-          await loadRoster();
+      async function loadNextMatch() {
+          try {
+              const res = await fetch(`https://api.github.com/repos/${REPO}/contents/_data/next_match.json`);
+              const file = await res.json();
+              const d = JSON.parse(decodeURIComponent(escape(atob(file.content)))); // Toto je "kladivo" na diakritiku
+              document.getElementById('nm-home-name').innerText = d.home_name;
+              document.getElementById('nm-away-name').innerText = d.away_name;
+              document.getElementById('nm-home-logo').src = d.home_logo;
+              document.getElementById('nm-away-logo').src = d.away_logo;
+              document.getElementById('nm-time').innerText = d.time;
+              document.getElementById('nm-info').innerText = d.info;
+          } catch(e) {
+              console.log("Chyba v loadNextMatch:", e);
+          }
       }
 
       async function loadNews() {
