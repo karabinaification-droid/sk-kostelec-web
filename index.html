@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SK Kostelec nad Cernymi lesy</title>
+    <title>SK Kostelec nad Černými lesy</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -98,20 +98,26 @@
     <script>
       const REPO = 'karabinaification-droid/sk-kostelec-web';
 
+      async function init() {
+          await loadNews();
+          await loadNextMatch();
+          await generateTable();
+          await loadRoster();
+      }
+
       async function loadNextMatch() {
           try {
               const res = await fetch(`https://api.github.com/repos/${REPO}/contents/_data/next_match.json`);
               const file = await res.json();
-              const d = JSON.parse(decodeURIComponent(escape(atob(file.content)))); // Toto je "kladivo" na diakritiku
+              // Oprava diakritiky pro JSON z GitHubu
+              const d = JSON.parse(decodeURIComponent(escape(atob(file.content))));
               document.getElementById('nm-home-name').innerText = d.home_name;
               document.getElementById('nm-away-name').innerText = d.away_name;
               document.getElementById('nm-home-logo').src = d.home_logo;
               document.getElementById('nm-away-logo').src = d.away_logo;
               document.getElementById('nm-time').innerText = d.time;
               document.getElementById('nm-info').innerText = d.info;
-          } catch(e) {
-              console.log("Chyba v loadNextMatch:", e);
-          }
+          } catch(e) { console.error("Chyba loadNextMatch:", e); }
       }
 
       async function loadNews() {
@@ -130,20 +136,6 @@
                     feed.innerHTML += `<article class="article-row"><div class="art-img" style="background-image: url('${imgMatch[1]}')"></div><div class="art-text"><h3>${titleMatch[1]}</h3></div></article>`;
                   }
               }
-          } catch(e) {}
-      }
-
-      async function loadNextMatch() {
-          try {
-              const res = await fetch(`https://api.github.com/repos/${REPO}/contents/_data/next_match.json`);
-              const file = await res.json();
-              const d = JSON.parse(atob(file.content));
-              document.getElementById('nm-home-name').innerText = d.home_name;
-              document.getElementById('nm-away-name').innerText = d.away_name;
-              document.getElementById('nm-home-logo').src = d.home_logo;
-              document.getElementById('nm-away-logo').src = d.away_logo;
-              document.getElementById('nm-time').innerText = d.time;
-              document.getElementById('nm-info').innerText = d.info;
           } catch(e) {}
       }
 
