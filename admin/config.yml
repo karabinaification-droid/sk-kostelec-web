@@ -1,6 +1,6 @@
 backend:
   name: git-gateway
-  branch: main # Ujisti se, že se tvá větev na GitHubu jmenuje main
+  branch: main
 
 media_folder: "assets/images"
 public_folder: "/assets/images"
@@ -8,7 +8,7 @@ public_folder: "/assets/images"
 collections:
   - name: "blog"
     label: "Aktuality"
-    folder: "_posts" # Sem CMS automaticky uloží články jako .md soubory
+    folder: "_posts"
     create: true
     slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
     fields:
@@ -18,15 +18,59 @@ collections:
       - { label: "Úvodní fotka", name: "image", widget: "image" }
       - { label: "Text článku", name: "body", widget: "markdown" }
 
-  - name: "tabulka"
-    label: "Tabulka výsledků"
-    folder: "_data/table" # Sem se uloží data o týmech jako JSON
+  - name: "teams"
+    label: "1. Adresář týmů (Loga)"
+    folder: "_data/teams"
+    create: true
+    extension: "json"
+    format: "json"
+    identifier_field: title
+    slug: "{{slug}}"
+    fields:
+      - { label: "Název týmu (přesně)", name: "title", widget: "string" }
+      - { label: "Zkratka/ID (např. kostelec, pacov)", name: "id", widget: "string" }
+      - { label: "Logo týmu", name: "logo", widget: "image" }
+
+  - name: "matches"
+    label: "2. Odehrané zápasy (Tabulka)"
+    folder: "_data/matches"
+    create: true
+    extension: "json"
+    format: "json"
+    slug: "match-{{year}}-{{month}}-{{day}}-{{hour}}-{{minute}}"
+    fields:
+      - { label: "Domácí (ID týmu)", name: "home_id", widget: "string" }
+      - { label: "Hosté (ID týmu)", name: "away_id", widget: "string" }
+      - { label: "Góly Domácí", name: "home_score", widget: "number" }
+      - { label: "Góly Hosté", name: "away_score", widget: "number" }
+      - { label: "Datum zápasu", name: "date", widget: "datetime" }
+
+  - name: "next_match"
+    label: "3. Příští zápas (Pruh)"
+    files:
+      - label: "Nastavení příštího zápasu"
+        name: "setup"
+        file: "_data/next_match.json"
+        fields:
+          - { label: "Domácí (Název)", name: "home_name", widget: "string" }
+          - { label: "Hosté (Název)", name: "away_name", widget: "string" }
+          - { label: "Logo Domácí", name: "home_logo", widget: "image" }
+          - { label: "Logo Hosté", name: "away_logo", widget: "image" }
+          - { label: "Čas (např. 15:00)", name: "time", widget: "string" }
+          - { label: "Datum a Místo", name: "info", widget: "string" }
+
+  - name: "players"
+    label: "4. Soupiska A-Tým"
+    folder: "_data/players"
     create: true
     extension: "json"
     format: "json"
     slug: "{{slug}}"
     fields:
-      - { label: "Název týmu", name: "title", widget: "string" }
-      - { label: "Pořadí (#)", name: "rank", widget: "number" }
-      - { label: "Zápasy", name: "matches", widget: "number" }
-      - { label: "Body", name: "points", widget: "number" }
+      - { label: "Jméno a příjmení", name: "title", widget: "string" }
+      - { label: "Číslo dresu", name: "number", widget: "number" }
+      - { label: "Fotka hráče", name: "image", widget: "image" }
+      - { label: "Post", name: "position", widget: "select", options: ["Brankář", "Obránce", "Záložník", "Útočník"] }
+      - { label: "Narozen", name: "born", widget: "string" }
+      - { label: "Výška (cm)", name: "height", widget: "string" }
+      - { label: "Váha (kg)", name: "weight", widget: "string" }
