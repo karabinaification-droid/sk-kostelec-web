@@ -14,6 +14,7 @@ collections:
     slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
     fields:
       - { label: "Nadpis", name: "title", widget: "string" }
+      - { label: "Zobrazit jako hlavní novinku (Top 3 nahoře)", name: "featured", widget: "boolean", default: false }
       - { label: "Datum", name: "date", widget: "datetime" }
       - { label: "Kategorie", name: "category", widget: "select", options: ["A-Tým", "Mládež", "Klub"] }
       - { label: "Úvodní fotka", name: "image", widget: "image" }
@@ -40,8 +41,20 @@ collections:
     format: "json"
     slug: "match-{{year}}-{{month}}-{{day}}-{{hour}}-{{minute}}"
     fields:
-      - { label: "Domácí (ID týmu)", name: "home_id", widget: "string" }
-      - { label: "Hosté (ID týmu)", name: "away_id", widget: "string" }
+      - label: "Domácí"
+        name: "home_id"
+        widget: "relation"
+        collection: "teams"
+        search_fields: ["title"]
+        value_field: "id"
+        display_fields: ["title"]
+      - label: "Hosté"
+        name: "away_id"
+        widget: "relation"
+        collection: "teams"
+        search_fields: ["title"]
+        value_field: "id"
+        display_fields: ["title"]
       - { label: "Góly Domácí", name: "home_score", widget: "number" }
       - { label: "Góly Hosté", name: "away_score", widget: "number" }
       - { label: "Datum zápasu", name: "date", widget: "datetime" }
