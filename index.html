@@ -20,8 +20,8 @@
         .kb-info { font-size: 0.85rem; color: #777; }
         .kb-label { font-size: 0.75rem; text-transform: uppercase; color: #999; margin-bottom: 10px; }
 
-        /* Hlavní novinky - 3 velké dlaždice */
-        .top-news-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px; }
+        /* Hlavní novinky - 3 velké dlaždice (zobrazí se jen ty zaškrtnuté) */
+        .top-news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-bottom: 40px; }
         .top-news-card { position: relative; height: 300px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); cursor: pointer; }
         .tn-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
         .top-news-card:hover .tn-img { transform: scale(1.1); }
@@ -64,8 +64,7 @@
     </header>
 
     <main class="main-container">
-        <div class="top-news-grid" id="top-news-feed">
-            </div>
+        <div class="top-news-grid" id="top-news-feed"></div>
 
         <section class="karvina-box">
             <div class="kb-team" id="nm-home-name">Načítám...</div>
@@ -100,13 +99,10 @@
     <footer class="site-footer">
         <div class="main-container">
             <div class="footer-grid">
-                <div class="footer-col">
-                    <img src="logo-sk-kostelec.png" alt="SK Kostelec" class="footer-logo">
-                </div>
+                <div class="footer-col"><img src="logo-sk-kostelec.png" alt="SK Kostelec" class="footer-logo"></div>
                 <div class="footer-col">
                     <h4>SK Kostelec n. Č. l.</h4>
-                    <p>V Kouřimi 543</p>
-                    <p>281 63 Kostelec nad Černými lesy</p>
+                    <p>V Kouřimi 543, 281 63</p>
                     <p>IČO: 43750271</p>
                 </div>
                 <div class="footer-col">
@@ -115,14 +111,10 @@
                     <p>Tel: +420 724 163 176</p>
                     <p>Předseda: Jiří Štursa</p>
                 </div>
-                <div class="footer-col">
-                    <h4>Sledujte nás</h4>
-                    <p>Facebook</p>
-                    <p>Instagram</p>
-                </div>
+                <div class="footer-col"><h4>Sledujte nás</h4><p>Facebook</p></div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 SK Kostelec nad Černými lesy & eSports.cz, s.r.o.</p>
+                <p>&copy; 2026 SK Kostelec nad Černými lesy. Všechna práva vyhrazena.</p>
             </div>
         </div>
     </footer>
@@ -159,34 +151,34 @@
               feed.innerHTML = '';
               topFeed.innerHTML = '';
               
-              let count = 0;
               for (const file of files.reverse()) {
                   const r = await fetch(file.download_url);
                   const content = await r.text();
                   const meta = content.split('---')[1];
+                  
                   const titleMatch = meta.match(/title:\s*["']?(.*?)["']?$/m);
                   const imgMatch = meta.match(/image:\s*["']?(.*?)["']?$/m);
+                  // Hledáme, zda je v článku "featured: true"
+                  const featuredMatch = meta.match(/featured:\s*(true|false)/);
+                  const isFeatured = featuredMatch ? featuredMatch[1] === 'true' : false;
                   
                   if (titleMatch && imgMatch) {
-                    if (count < 3) {
-                        // První tři jdou do velkých dlaždic
+                    if (isFeatured) {
                         topFeed.innerHTML += `
                             <div class="top-news-card">
                                 <img src="${imgMatch[1]}" class="tn-img">
                                 <div class="tn-overlay"><h3 class="tn-title">${titleMatch[1]}</h3></div>
                             </div>`;
                     } else {
-                        // Ostatní do seznamu pod tím
                         feed.innerHTML += `
                             <article class="article-row">
                                 <div class="art-img" style="background-image: url('${imgMatch[1]}')"></div>
                                 <div class="art-text"><h3>${titleMatch[1]}</h3></div>
                             </article>`;
                     }
-                    count++;
                   }
               }
-          } catch(e) {}
+          } catch(e) { console.error(e); }
       }
 
       async function generateTable() {
