@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soupiska A-Tým | SK Kostelec nad Černými lesy</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <style>
+        .main-container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+        .page-title { border-left: 5px solid #0033ff; padding-left: 15px; margin-bottom: 40px; text-transform: uppercase; }
+        
+        /* Mřížka hráčů */
+        .roster-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; }
+        .player-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); cursor: pointer; transition: 0.3s; border-bottom: 6px solid #0033ff; text-align: center; }
+        .player-card:hover { transform: translateY(-10px); }
+        .player-img { width: 100%; height: 320px; object-fit: cover; background: #f4f4f4; }
+        .p-info { padding: 20px; }
+        .p-number { font-size: 1.8rem; font-weight: 900; color: #0033ff; display: block; line-height: 1; }
+        .p-name { font-size: 1.2rem; font-weight: bold; margin: 10px 0; display: block; text-transform: uppercase; }
+        .p-pos { font-size: 0.9rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Detail hráče (Modal) */
+        .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); }
+        .modal-content { background: white; margin: 5% auto; padding: 40px; border-radius: 20px; width: 90%; max-width: 500px; position: relative; text-align: center; }
+        .close-modal { position: absolute; right: 25px; top: 15px; font-size: 35px; cursor: pointer; color: #bbb; }
+        .modal-img { width: 200px; height: 200px; border-radius: 50%; object-fit: cover; border: 6px solid #0033ff; margin-bottom: 20px; }
+        .modal-details { margin-top: 25px; text-align: left; background: #f8f9fa; padding: 20px; border-radius: 10px; }
+        .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .detail-row:last-child { border: none; }
+        .detail-row strong { color: #0033ff; }
+
+        /* Patička shodná s indexem */
+        .site-footer { background: #f8f9fa; border-top: 1px solid #eee; padding: 60px 0 20px 0; margin-top: 80px; }
+        .footer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; }
+        .footer-logo { max-width: 120px; }
+        .footer-bottom { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; color: #999; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo-container"><img src="logo-sk-kostelec.png" alt="Logo SK Kostelec" class="main-logo"></div>
+            <ul class="nav-links">
+                <li><a href="index.html">Aktuality</a></li>
+                <li><a href="soupiska.html" class="active">A-Tým</a></li>
+                <li><a href="#">Klub</a></li>
+                <li><a href="#">Kontakt</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="main-container">
+        <h1 class="page-title">Soupiska A-Tým</h1>
+        <div class="roster-grid" id="roster-grid">
+            </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="main-container">
+            <div class="footer-grid">
+                <div class="footer-col"><img src="logo-sk-kostelec.png" alt="SK Kostelec" class="footer-logo"></div>
+                <div class="footer-col">
+                    <h4>SK Kostelec n. Č. l.</h4>
+                    <p>V Kouřimi 543, 281 63</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Kontakty</h4>
+                    <p>skkostelec@seznam.cz</p>
+                    <p>+420 724 163 176</p>
+                </div>
+                <div class="footer-col"><h4>Sledujte nás</h4><p>Facebook</p></div>
+            </div>
+            <div class="footer-bottom"><p>&copy; 2026 SK Kostelec nad Černými lesy</p></div>
+        </div>
+    </footer>
+
+    <div id="playerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closePlayerModal()">&times;</span>
+            <img id="m-img" src="" class="modal-img">
+            <h2 id="m-name" style="margin:0;"></h2>
+            <span id="m-pos" style="color:#888; text-transform:uppercase; font-size:0.9rem;"></span>
+            <div class="modal-details">
+                <div class="detail-row"><span>Číslo dresu:</span><strong id="m-num"></strong></div>
+                <div class="detail-row"><span>Narozen:</span><strong id="m-born"></strong></div>
+                <div class="detail-row"><span>Výška / Váha:</span><strong id="m-hv"></strong></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+      const REPO = 'karabinaification-droid/sk-kostelec-web';
+
+      async function loadRoster() {
+          const grid = document.getElementById('roster-grid');
+          try {
+              const res = await fetch(`https://api.github.com/repos/${REPO}/contents/_data/players`);
+              const files = await res.json();
+              grid.innerHTML = '';
+              for (const file of files) {
+                  const r = await fetch(file.download_url);
+                  const p = await r.json();
+                  const card = document.createElement('div');
+                  card.className = 'player-card';
+                  card.onclick = () => openPlayerModal(p);
+                  card.innerHTML = `
+                    <img src="${p.image}" class="player-img">
+                    <div class="p-info">
+                        <span class="p-number">#${p.number}</span>
+                        <span class="p-name">${p.title}</span>
+                        <span class="p-pos">${p.position}</span>
+                    </div>`;
+                  grid.appendChild(card);
+              }
+          } catch(e) { console.error(e); }
+      }
+
+      function openPlayerModal(p) {
+          document.getElementById('m-img').src = p.image;
+          document.getElementById('m-name').innerText = p.title;
+          document.getElementById('m-pos').innerText = p.position;
+          document.getElementById('m-num').innerText = p.number;
+          document.getElementById('m-born').innerText = p.born;
+          document.getElementById('m-hv').innerText = `${p.height} cm / ${p.weight} kg`;
+          document.getElementById('playerModal').style.display = 'block';
+      }
+
+      function closePlayerModal() { document.getElementById('playerModal').style.display = 'none'; }
+      window.onclick = (e) => { if(e.target == document.getElementById('playerModal')) closePlayerModal(); }
+
+      loadRoster();
+    </script>
+</body>
+</html>
