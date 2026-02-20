@@ -1,0 +1,19 @@
+backend:
+  name: git-gateway
+  branch: main # Ujisti se, že se tvá větev na GitHubu jmenuje main
+
+media_folder: "assets/images"
+public_folder: "/assets/images"
+
+collections:
+  - name: "blog"
+    label: "Aktuality"
+    folder: "_posts" # Sem CMS automaticky uloží články jako .md soubory
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - { label: "Nadpis", name: "title", widget: "string" }
+      - { label: "Datum", name: "date", widget: "datetime" }
+      - { label: "Kategorie", name: "category", widget: "select", options: ["A-Tým", "Mládež", "Klub"] }
+      - { label: "Úvodní fotka", name: "image", widget: "image" }
+      - { label: "Text článku", name: "body", widget: "markdown" }

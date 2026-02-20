@@ -1,0 +1,196 @@
+/* Globální nastavení */
+:root {
+    --club-blue: #0033ff;
+    --club-yellow: #ffff00;
+    --dark: #1a1a1a;
+    --light: #f9f9f9;
+    --text: #333;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', Roboto, sans-serif; background-color: var(--light); color: var(--text); line-height: 1.6; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+/* Navigace */
+.navbar {
+    background-color: var(--club-blue);
+    height: 70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 5px solid var(--club-yellow);
+}
+
+.logo-container { position: absolute; left: 5%; top: 0; }
+.main-logo {
+    height: 130px;
+    background: #fff;
+    padding: 10px;
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    border: 2px solid var(--club-yellow);
+    border-top: none;
+}
+
+.nav-links { list-style: none; display: flex; gap: 40px; }
+.nav-links a { 
+    color: #fff; 
+    text-decoration: none; 
+    font-weight: bold; 
+    text-transform: uppercase;
+    font-size: 14px;
+    transition: 0.3s;
+}
+.nav-links a:hover { color: var(--club-yellow); }
+
+/* News Hero (Karviná Style) */
+.news-hero {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: 250px 250px;
+    gap: 10px;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.news-card {
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.main-news { grid-column: span 2; grid-row: span 2; }
+.sub-news { grid-column: span 2; }
+
+.news-card:hover { transform: scale(1.01); }
+
+.overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.9));
+    padding: 20px;
+    color: #fff;
+}
+
+.category {
+    background: var(--club-yellow);
+    color: #000;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
+/* Next Match Bar */
+.next-match-bar {
+    background: var(--dark);
+    color: #fff;
+    padding: 20px 0;
+    border-top: 2px solid var(--club-yellow);
+}
+
+.next-match-bar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.match-label { color: var(--club-yellow); font-weight: bold; margin-right: 15px; }
+.btn-yellow {
+    background: var(--club-yellow);
+    color: #000;
+    text-decoration: none;
+    padding: 10px 20px;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+.btn-yellow:hover { background: #fff; }
+
+/* Main Content Grid */
+.main-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 40px;
+    margin-top: 40px;
+}
+
+.section-title {
+    border-left: 5px solid var(--club-blue);
+    padding-left: 15px;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+}
+
+/* Articles */
+.article-row {
+    display: flex;
+    gap: 20px;
+    background: #fff;
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.art-img { width: 150px; height: 100px; background-size: cover; border-radius: 3px; flex-shrink: 0; }
+.art-text .date { font-size: 12px; color: #888; }
+.art-text h3 { margin: 5px 0; font-size: 18px; color: var(--club-blue); }
+
+/* Sidebar & Table */
+.league-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    font-size: 14px;
+}
+
+.league-table th { background: var(--club-blue); color: #fff; padding: 10px; text-align: left; }
+.league-table td { padding: 10px; border-bottom: 1px solid #ddd; }
+.league-table tr.highlight { background: #ffff0033; font-weight: bold; }
+
+.full-table-link {
+    display: block;
+    margin-top: 15px;
+    color: var(--club-blue);
+    font-weight: bold;
+    text-decoration: none;
+}
+
+/* Footer */
+.main-footer { background: var(--dark); color: #ccc; padding: 60px 0 20px; }
+.footer-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+.footer-logo { height: 80px; margin-bottom: 20px; }
+.footer-col h4 { color: #fff; margin-bottom: 20px; text-transform: uppercase; }
+.footer-col ul { list-style: none; }
+.footer-col ul a { color: #888; text-decoration: none; line-height: 2; }
+.footer-col ul a:hover { color: var(--club-yellow); }
+
+.partner-logos { display: flex; gap: 10px; margin-top: 20px; }
+.p-box { border: 1px solid #444; padding: 10px; font-size: 12px; }
+
+.footer-bottom {
+    text-align: center;
+    border-top: 1px solid #333;
+    margin-top: 40px;
+    padding-top: 20px;
+    font-size: 12px;
+}
+
+/* Responzivita */
+@media (max-width: 900px) {
+    .main-content { grid-template-columns: 1fr; }
+    .news-hero { grid-template-columns: 1fr; grid-template-rows: auto; }
+    .logo-container { left: 2%; }
+    .nav-links { gap: 15px; }
+}
