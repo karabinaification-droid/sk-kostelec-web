@@ -1,4 +1,8 @@
-/* Globální nastavení */
+/* style.css - KOMPLETNÍ VERZE SE VŠEMI FUNKCEMI, ANIMACEMI A OPRAVOU PŘEKRÝVÁNÍ */
+
+/* 1. IMPORT PÍSEM: Inter pro text, Oswald pro extra vysoké nadpisy */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Oswald:wght@400;700&display=swap');
+
 :root {
     --club-blue: #0033ff;
     --club-yellow: #ffff00;
@@ -7,190 +11,318 @@
     --text: #333;
 }
 
+/* Plynulé scrollování */
+html {
+    scroll-behavior: smooth;
+}
+
+/* FIX: Zajištění, že stránka nikdy neuhne do stran */
+html, body { 
+    overflow-x: hidden; 
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Segoe UI', Roboto, sans-serif; background-color: var(--light); color: var(--text); line-height: 1.6; }
+
+/* GLOBÁLNÍ PÍSMO */
+body { 
+    font-family: 'Inter', sans-serif; 
+    background-color: var(--light); 
+    color: var(--text); 
+    line-height: 1.6;
+    padding-top: 70px; /* Místo pro FIXED menu */
+    -webkit-font-smoothing: antialiased;
+}
+
 .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 
-/* Navigace */
+/* NAVIGACE - FIXED VERZE */
 .navbar {
     background-color: var(--club-blue);
     height: 70px;
     display: flex;
     justify-content: center;
     align-items: center;
-    position: sticky;
+    position: fixed;
     top: 0;
-    z-index: 1000;
-    border-bottom: 5px solid var(--club-yellow);
+    left: 0;
+    width: 100%;
+    z-index: 999999 !important; 
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
-.logo-container { position: absolute; left: 5%; top: 0; }
-.main-logo {
-    height: 130px;
-    background: #fff;
-    padding: 10px;
-    border-radius: 0 0 10px 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    border: 2px solid var(--club-yellow);
-    border-top: none;
-}
+.logo-container { position: absolute; left: 5%; top: 0; z-index: 1000000; }
+.main-logo { height: 130px; padding: 10px; background: transparent; border-radius: 0 0 10px 10px; }
 
 .nav-links { list-style: none; display: flex; gap: 40px; }
 .nav-links a { 
     color: #fff; 
     text-decoration: none; 
-    font-weight: bold; 
+    font-family: 'Oswald', sans-serif;
+    font-weight: 400; 
     text-transform: uppercase;
-    font-size: 14px;
+    font-size: 19px;
+    letter-spacing: 0.5px;
+    display: inline-block;
+    transform: scaleY(1.2); /* Protažení navigace */
     transition: 0.3s;
 }
 .nav-links a:hover { color: var(--club-yellow); }
 
-/* News Hero (Karviná Style) */
-.news-hero {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: 250px 250px;
-    gap: 10px;
-    padding: 10px;
-    margin-top: 10px;
-}
+.menu-toggle { display: none; } /* Skryté na desktopu */
 
-.news-card {
-    background-size: cover;
-    background-position: center;
-    position: relative;
-    cursor: pointer;
-    overflow: hidden;
-    transition: transform 0.3s ease;
-}
-
-.main-news { grid-column: span 2; grid-row: span 2; }
-.sub-news { grid-column: span 2; }
-
-.news-card:hover { transform: scale(1.01); }
-
-.overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(transparent, rgba(0,0,0,0.9));
-    padding: 20px;
-    color: #fff;
-}
-
-.category {
-    background: var(--club-yellow);
-    color: #000;
-    padding: 2px 8px;
-    font-size: 12px;
-    font-weight: bold;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-    display: inline-block;
-}
-
-/* Next Match Bar */
-.next-match-bar {
-    background: var(--dark);
-    color: #fff;
-    padding: 20px 0;
-    border-top: 2px solid var(--club-yellow);
-}
-
-.next-match-bar .container {
+/* TOP NEWS GRID - KOMPLETNÍ S ANIMACEMI */
+.top-news-grid { 
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.match-label { color: var(--club-yellow); font-weight: bold; margin-right: 15px; }
-.btn-yellow {
-    background: var(--club-yellow);
-    color: #000;
-    text-decoration: none;
-    padding: 10px 20px;
-    font-weight: bold;
-    border-radius: 5px;
-    transition: 0.3s;
-}
-.btn-yellow:hover { background: #fff; }
-
-/* Main Content Grid */
-.main-content {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 40px;
-    margin-top: 40px;
-}
-
-.section-title {
-    border-left: 5px solid var(--club-blue);
-    padding-left: 15px;
-    margin-bottom: 25px;
-    text-transform: uppercase;
-}
-
-/* Articles */
-.article-row {
-    display: flex;
-    gap: 20px;
-    background: #fff;
-    margin-bottom: 20px;
-    padding: 15px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-.art-img { width: 150px; height: 100px; background-size: cover; border-radius: 3px; flex-shrink: 0; }
-.art-text .date { font-size: 12px; color: #888; }
-.art-text h3 { margin: 5px 0; font-size: 18px; color: var(--club-blue); }
-
-/* Sidebar & Table */
-.league-table {
+    gap: 0; 
+    margin-top: 0; 
+    margin-bottom: 40px; 
+    height: 500px;
     width: 100%;
-    border-collapse: collapse;
-    background: #fff;
-    font-size: 14px;
+    position: relative;
+    overflow: hidden;
 }
 
-.league-table th { background: var(--club-blue); color: #fff; padding: 10px; text-align: left; }
-.league-table td { padding: 10px; border-bottom: 1px solid #ddd; }
-.league-table tr.highlight { background: #ffff0033; font-weight: bold; }
+.tn-card-wrapper {
+    flex: 1;
+    transition: flex 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    position: relative;
+}
 
-.full-table-link {
+.tn-card-wrapper:first-child { flex: 2.2; }
+.tn-card-wrapper:hover { flex: 3.5 !important; }
+.top-news-grid:hover .tn-card-wrapper { flex: 1; }
+
+.top-news-card { 
+    width: 100%; 
+    height: 100%;
+    background-size: cover; 
+    background-position: center center;
+    position: relative; 
+    cursor: pointer;
+    transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.tn-card-wrapper:hover .top-news-card { transform: scale(1.05); }
+
+.tn-overlay { 
+    position: absolute; bottom: 0; left: 0; right: 0; height: 100%;
+    background: linear-gradient(to top, var(--light) 0%, rgba(249, 249, 249, 0.4) 50%, transparent 100%); 
+    padding: 40px; display: flex; flex-direction: column; justify-content: flex-end;
+    pointer-events: none;
+}
+
+.tn-content { 
+    position: absolute;
+    bottom: 40px;
+    left: 40px;
+    width: 800px; 
+    pointer-events: none;
+}
+
+/* FIX: Mezera pod datem, aby do něj nadpis nelezl */
+.tn-date { 
+    display: block; 
+    font-size: 0.85rem; 
+    font-weight: 600; 
+    color: var(--club-blue); 
+    text-transform: uppercase; 
+    margin-bottom: 25px; 
+}
+
+/* FIX: Protažený nadpis se roztahuje od středu */
+.tn-title { 
+    font-family: 'Oswald', sans-serif;
+    font-size: 2.8rem; 
+    font-weight: 700; 
+    color: #000; 
+    margin: 0 0 15px 0; 
+    line-height: 1; 
+    text-transform: uppercase; 
+    white-space: nowrap; 
+    transform: scaleY(1.3); 
+    transform-origin: left center; 
+}
+
+.tn-excerpt { 
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem; 
+    color: #333; 
+    margin: 0; 
+    opacity: 0; 
+    transform: translateY(15px); 
+    transition: opacity 0.8s ease-out 0.4s, transform 0.8s ease-out 0.4s; 
+    line-height: 1.5;
+    overflow: hidden;
     display: block;
-    margin-top: 15px;
-    color: var(--club-blue);
-    font-weight: bold;
-    text-decoration: none;
+    max-width: 500px;
+    font-weight: 400;
 }
 
-/* Footer */
+.tn-card-wrapper:hover .tn-excerpt,
+.tn-card-wrapper:first-child:not(.top-news-grid:hover .tn-card-wrapper) .tn-excerpt {
+    opacity: 1; transform: translateY(0);
+}
+
+/* KARVINÁ BOX - KOMPLETNÍ */
+.karvina-box { 
+    background: #fff; border-radius: 12px; padding: 25px; 
+    display: flex; align-items: center; justify-content: space-around; 
+    text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
+    margin: 20px 0 40px 0; border: 1px solid #eee; 
+}
+.kb-team { flex: 1; font-weight: 600; font-size: 1.1rem; }
+.kb-logo { width: 70px; height: 70px; object-fit: contain; }
+.kb-center { flex: 1; border-left: 1px solid #eee; border-right: 1px solid #eee; margin: 0 15px; }
+.kb-time { 
+    font-family: 'Oswald', sans-serif; 
+    font-size: 3rem; 
+    font-weight: 700; 
+    color: #0033ff; 
+    line-height: 1; 
+    margin-bottom: 5px; 
+    transform: scaleY(1.2);
+}
+.kb-info { font-size: 0.85rem; color: #777; font-weight: 400; }
+.kb-label { font-size: 0.75rem; text-transform: uppercase; color: #999; margin-bottom: 10px; font-weight: 600; }
+
+/* ČLÁNKY */
+.article-row { display: flex; gap: 15px; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; transition: 0.3s; }
+.article-row:hover { transform: translateX(5px); }
+.art-img { width: 100px; height: 65px; background-size: cover; background-position: center; border-radius: 6px; flex-shrink: 0; }
+.art-text h3 { 
+    margin: 0; 
+    font-size: 1rem; 
+    line-height: 1.3; 
+    color: var(--dark); 
+    font-weight: 500;
+}
+
+/* FIX LAYOUTU: Tabulka bez posuvníku na desktopu */
+.content-layout { display: flex; gap: 40px; margin-top: 40px; align-items: start; }
+.news-section { flex: 1; }
+.sidebar-section { width: 380px; flex-shrink: 0; }
+
+/* POSUVNÍK JEN NA MOBILU */
+.table-responsive {
+    width: 100%;
+    border-radius: 12px;
+}
+
+/* NADPISY SEKCÍ */
+h2, .section-title {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 1.8rem;
+    transform: scaleY(1.25);
+    transform-origin: left bottom;
+    margin-bottom: 25px;
+    letter-spacing: 0.5px;
+}
+
+/* PARTNEŘI - KOMPLETNÍ */
+.partners-section { width: 100%; padding: 60px 0; margin-top: 40px; border-top: 1px solid rgba(0,0,0,0.06); }
+.partners-title { 
+    text-align: center; 
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.6rem; 
+    font-weight: 400; 
+    color: #666; 
+    text-transform: uppercase; 
+    letter-spacing: 2px; 
+    margin-bottom: 40px; 
+    transform: scaleY(1.2);
+}
+.partners-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: center; align-items: center; gap: 80px; padding: 0 20px; }
+.partners-container a { display: block; transition: transform 0.3s; }
+.partners-container a:hover { transform: scale(1.15); }
+.partners-container img { height: 80px; width: auto; object-fit: contain; display: block; filter: grayscale(1); opacity: 0.6; transition: 0.3s; }
+.partners-container a:hover img { filter: grayscale(0); opacity: 1; }
+
+/* FOOTER - KOMPLETNÍ */
 .main-footer { background: var(--dark); color: #ccc; padding: 60px 0 20px; }
 .footer-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
 .footer-logo { height: 80px; margin-bottom: 20px; }
-.footer-col h4 { color: #fff; margin-bottom: 20px; text-transform: uppercase; }
-.footer-col ul { list-style: none; }
-.footer-col ul a { color: #888; text-decoration: none; line-height: 2; }
-.footer-col ul a:hover { color: var(--club-yellow); }
-
-.partner-logos { display: flex; gap: 10px; margin-top: 20px; }
-.p-box { border: 1px solid #444; padding: 10px; font-size: 12px; }
-
-.footer-bottom {
-    text-align: center;
-    border-top: 1px solid #333;
-    margin-top: 40px;
-    padding-top: 20px;
-    font-size: 12px;
+.footer-col h4 { 
+    font-family: 'Oswald', sans-serif;
+    color: #fff; 
+    margin-bottom: 20px; 
+    text-transform: uppercase; 
+    font-size: 1.4rem;
+    transform: scaleY(1.2);
+    transform-origin: left;
 }
+.footer-col ul { list-style: none; padding: 0; }
+.footer-col ul a { color: #888; text-decoration: none; line-height: 2.2; transition: 0.3s; font-weight: 400; }
+.footer-col ul a:hover { color: var(--club-yellow); }
+.footer-bottom { text-align: center; border-top: 1px solid #333; margin-top: 40px; padding-top: 20px; font-size: 12px; }
 
-/* Responzivita */
-@media (max-width: 900px) {
-    .main-content { grid-template-columns: 1fr; }
-    .news-hero { grid-template-columns: 1fr; grid-template-rows: auto; }
-    .logo-container { left: 2%; }
-    .nav-links { gap: 15px; }
+/* BACK TO TOP */
+#backToTop {
+    display: none; position: fixed; bottom: 30px; right: 30px; z-index: 999999;
+    border: none; background-color: var(--club-yellow); color: #000;
+    cursor: pointer; width: 50px; height: 50px; border-radius: 50%;
+    font-weight: bold; font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    transition: 0.3s;
+}
+#backToTop:hover { background-color: #fff; transform: scale(1.1); }
+
+/* RESPONZIVITA - KOMPLETNÍ */
+@media (max-width: 1000px) {
+    body, html { overflow-x: hidden !important; width: 100% !important; position: relative; }
+    .navbar { height: 60px; justify-content: flex-end; padding-right: 60px; }
+    body { padding-top: 60px; }
+    .main-logo { height: 80px; padding: 5px; }
+    .logo-container { left: 10px; }
+
+    .menu-toggle {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 25px;
+        height: 18px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        position: absolute;
+        right: 20px;
+        z-index: 1000001;
+    }
+    .menu-toggle span { width: 100%; height: 3px; background-color: #fff; border-radius: 10px; transition: 0.3s; }
+    .menu-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .menu-toggle.active span:nth-child(2) { opacity: 0; }
+    .menu-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+
+    .nav-links {
+        position: fixed; right: -100%; top: 60px; flex-direction: column;
+        background-color: var(--club-blue); width: 100%; height: calc(100vh - 60px);
+        text-align: center; transition: 0.3s; gap: 0; z-index: 1000000; padding-top: 20px;
+    }
+    .nav-links.active { right: 0; }
+    .nav-links li { width: 100%; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .nav-links a { transform: none; font-size: 24px; }
+
+    .karvina-box { flex-direction: column !important; gap: 15px !important; padding: 25px 15px !important; }
+    .kb-center { border: none !important; border-top: 1px solid #eee !important; border-bottom: 1px solid #eee !important; padding: 10px 0 !important; margin: 10px 0 !important; }
+
+    .top-news-grid { flex-direction: column; height: auto; width: 100%; }
+    .tn-card-wrapper { height: 350px; flex: none !important; width: 100%; }
+    .tn-overlay { background: linear-gradient(to top, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.7) 40%, transparent 100%); }
+    .tn-content { width: 90%; left: 20px; bottom: 20px; position: relative !important; }
+    .tn-title { font-size: 1.6rem; white-space: normal !important; transform: none; }
+    .tn-excerpt { display: block !important; opacity: 1 !important; transform: none !important; }
+
+    .content-layout { flex-direction: column; gap: 40px; }
+    .news-section, .sidebar-section { width: 100% !important; min-width: 100% !important; }
+
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .partners-container { flex-direction: column; gap: 40px; }
+    .footer-grid { grid-template-columns: 1fr; text-align: center; }
 }

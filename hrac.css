@@ -1,0 +1,115 @@
+/* hrac.css - KOMPLETNÍ VERZE S OPRAVENÝM ODSAZENÍM */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Oswald:wght@400;700&display=swap');
+
+/* SIDEBAR TITULKY */
+.sidebar-title {
+    font-family: 'Oswald', sans-serif;
+    text-transform: uppercase;
+    font-size: 2.2rem;
+    margin-bottom: 20px;
+    color: #1a1a1a;
+    display: block;
+    transform: scaleY(1.3);
+    transform-origin: left bottom;
+    letter-spacing: -1px;
+}
+
+/* SIDEBAR BOXY */
+.sidebar-box {
+    background: #fff;
+    border-radius: 12px;
+    padding: 10px 0;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    margin-bottom: 40px;
+}
+
+.sidebar-nav { list-style: none; padding: 0; margin: 0; }
+.sidebar-nav li { border-bottom: 1px solid #f8f9fa; }
+.sidebar-nav li:last-child { border-bottom: none; }
+.sidebar-nav a, .mini-player-item {
+    font-family: 'Inter', sans-serif;
+    text-decoration: none;
+    color: #333;
+    font-weight: 400;
+    display: flex; align-items: center;
+    padding: 15px 25px; transition: all 0.2s ease;
+}
+
+.mini-player-list { display: flex; flex-direction: column; }
+.mini-player-item b { color: #0033ff; width: 35px; font-family: 'Oswald', sans-serif; font-size: 1.1rem; }
+.mini-player-item:hover, .sidebar-nav a:hover { color: #0033ff !important; background: rgba(0, 51, 255, 0.02); }
+.mini-player-item.active, .sidebar-nav a.active { background: rgba(0, 51, 255, 0.05); color: #0033ff !important; font-weight: 600; }
+
+/* JMÉNO A ČÍSLO V POZADÍ (Návrat k původnímu) */
+.stats-header { 
+    position: relative; 
+    min-height: 220px; 
+    display: flex; 
+    align-items: center; 
+    margin-bottom: 30px;
+    padding-top: 20px;
+}
+
+.number-badge {
+    position: absolute;
+    right: 0;
+    top: 0;
+    font-family: 'Oswald', sans-serif;
+    font-size: 11rem;
+    font-weight: 700;
+    color: #0033ff;
+    opacity: 0.08;
+    line-height: 1;
+    z-index: 1;
+}
+
+.name-container { position: relative; z-index: 2; }
+
+/* FIX: Odsazení křestního jména */
+.p-first-name { 
+    font-size: 1.8rem; 
+    color: #666; 
+    text-transform: uppercase; 
+    font-weight: 300; 
+    display: block;
+    margin-bottom: 5px; 
+}
+
+/* FIX: Příjmení - line-height nastaven na 1.4 pro prostor při protažení */
+.p-last-name { 
+    font-family: 'Oswald', sans-serif; 
+    font-size: 5rem; 
+    font-weight: 700; 
+    text-transform: uppercase; 
+    color: #1a1a1a; 
+    line-height: 1.4; 
+    transform: scaleY(1.4); 
+    transform-origin: left bottom; 
+    display: block;
+}
+
+/* FIX: Odsazení pozice pod protaženým příjmením */
+.p-highlight { 
+    font-family: 'Oswald', sans-serif; 
+    color: #0033ff; 
+    font-size: 1.7rem; 
+    text-transform: uppercase; 
+    margin-top: 30px; 
+    display: block; 
+}
+
+/* STATISTIKY */
+.player-stats-row { 
+    display: flex; gap: 40px; margin: 40px 0; 
+    border-top: 1px solid #eee; border-bottom: 1px solid #eee; padding: 25px 0; 
+}
+.stat-item { display: flex; flex-direction: column; }
+.stat-item strong { font-family: 'Oswald', sans-serif; font-size: 0.95rem; color: #888; letter-spacing: 1px; }
+.stat-item span { font-family: 'Oswald', sans-serif; font-size: 3rem; color: #0033ff; font-weight: 700; line-height: 1; margin-top: 5px; }
+
+/* OSOBNÍ ÚDAJE */
+.personal-details h3 { font-family: 'Oswald', sans-serif; text-transform: uppercase; font-size: 1.5rem; transform: scaleY(1.2); transform-origin: left; margin-bottom: 20px; }
+
+@media (max-width: 1000px) {
+    .sidebar-title { font-size: 1.8rem; text-align: center; transform-origin: center; }
+}

@@ -7,19 +7,24 @@ media_folder: "assets/images"
 public_folder: "/assets/images"
 
 collections:
+  # 1. SEKCE: AKTUALITY A NOVINKY
   - name: "blog"
-    label: "Aktuality"
+    label: "Aktuality a Novinky"
     folder: "_posts"
     create: true
     slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
     fields:
       - { label: "Nadpis", name: "title", widget: "string" }
-      - { label: "Zobrazit jako hlavní novinku (Top 3 nahoře)", name: "featured", widget: "boolean", default: false }
+      - { label: "Typ příspěvku", name: "type", widget: "select", options: [
+          { label: "Krátká aktualita (do feedu)", value: "news-feed" },
+          { label: "Velká novinka (Top 3 nahoře)", value: "featured" }
+        ], default: "news-feed" }
       - { label: "Datum", name: "date", widget: "datetime" }
       - { label: "Kategorie", name: "category", widget: "select", options: ["A-Tým", "Mládež", "Klub"] }
-      - { label: "Úvodní fotka", name: "image", widget: "image" }
+      - { label: "Úvodní fotka (pouze pro velké novinky)", name: "image", widget: "image", required: false }
       - { label: "Text článku", name: "body", widget: "markdown" }
 
+  # 2. ADRESÁŘ TÝMŮ
   - name: "teams"
     label: "1. Adresář týmů (Loga)"
     folder: "_data/teams"
@@ -33,13 +38,14 @@ collections:
       - { label: "Zkratka/ID (např. kostelec, pacov)", name: "id", widget: "string" }
       - { label: "Logo týmu", name: "logo", widget: "image" }
 
+  # 3. ZÁPASY (ODEHRANÉ I BUDOUCÍ)
   - name: "matches"
-    label: "2. Odehrané zápasy (Tabulka)"
+    label: "2. Zápasy (Rozpis a Výsledky)"
     folder: "_data/matches"
     create: true
     extension: "json"
     format: "json"
-    slug: "match-{{year}}-{{month}}-{{day}}-{{hour}}-{{minute}}"
+    slug: "match-{{year}}-{{month}}-{{day}}"
     fields:
       - label: "Domácí"
         name: "home_id"
@@ -55,26 +61,33 @@ collections:
         search_fields: ["title"]
         value_field: "id"
         display_fields: ["title"]
-      - { label: "Góly Domácí", name: "home_score", widget: "number" }
-      - { label: "Góly Hosté", name: "away_score", widget: "number" }
-      - { label: "Datum zápasu", name: "date", widget: "datetime" }
+      - { label: "Datum a čas zápasu", name: "date", widget: "datetime" }
+      - { label: "Místo konání", name: "location", widget: "string", default: "Kostelec n. Č. l." }
+      - { label: "Zápas již odehrán?", name: "played", widget: "boolean", default: false }
+      
+      # STATISTIKY ZÁPASU (Zobrazí se jen když je odehráno)
+      - { label: "Góly Domácí", name: "home_score", widget: "number", required: false }
+      - { label: "Góly Hosté", name: "away_score", widget: "number", required: false }
+      - { label: "Poločas Domácí", name: "half_home", widget: "number", required: false }
+      - { label: "Poločas Hosté", name: "half_away", widget: "number", required: false }
+      
+      # STŘELCI (Propojení na soupisku)
+      - label: "Střelci gólů (Kostelec)"
+        name: "scorers"
+        widget: "list"
+        required: false
+        field:
+          label: "Hráč"
+          name: "player_id"
+          widget: "relation"
+          collection: "players"
+          search_fields: ["title"]
+          value_field: "title" # Propojení přes jméno pro statistiky
+          display_fields: ["title"]
 
-  - name: "next_match"
-    label: "3. Příští zápas (Pruh)"
-    files:
-      - label: "Nastavení příštího zápasu"
-        name: "setup"
-        file: "_data/next_match.json"
-        fields:
-          - { label: "Domácí (Název)", name: "home_name", widget: "string" }
-          - { label: "Hosté (Název)", name: "away_name", widget: "string" }
-          - { label: "Logo Domácí", name: "home_logo", widget: "image" }
-          - { label: "Logo Hosté", name: "away_logo", widget: "image" }
-          - { label: "Čas (např. 15:00)", name: "time", widget: "string" }
-          - { label: "Datum a Místo", name: "info", widget: "string" }
-
+  # 4. SOUPISKA
   - name: "players"
-    label: "4. Soupiska A-Tým"
+    label: "3. Soupiska A-Tým"
     folder: "_data/players"
     create: true
     extension: "json"
@@ -88,3 +101,7 @@ collections:
       - { label: "Narozen", name: "born", widget: "string" }
       - { label: "Výška (cm)", name: "height", widget: "string" }
       - { label: "Váha (kg)", name: "weight", widget: "string" }
+      # STATISTIKY (Budou se propisovat nebo editovat)
+      - { label: "Zápasy", name: "matches_count", widget: "number", default: 0 }
+      - { label: "Góly", name: "goals", widget: "number", default: 0 }
+      - { label: "Asistence", name: "assists", widget: "number", default: 0 }

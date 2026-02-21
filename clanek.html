@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail článku | SK Kostelec</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="clanek.css"> 
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo-container">
+                <img src="logo-sk-kostelec.png" alt="Logo SK Kostelec" class="main-logo">
+            </div>
+            
+            <button class="menu-toggle" aria-label="Otevřít menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <ul class="nav-links">
+                <li><a href="index.html">Aktuality</a></li>
+                <li><a href="soupiska.html">A-Tým</a></li>
+                <li><a href="klub.html">Klub</a></li>
+                <li><a href="kontakt.html">Kontakt</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div id="article-loader" class="article-detail-wrapper">
+            <div style="padding: 100px; text-align: center;">Načítám obsah článku...</div>
+        </div>
+    </main>
+
+    <section class="partners-section">
+        <h3 class="partners-title">Naši partneři</h3>
+        <div class="partners-container">
+            <a href="#"><img src="assets/images/sponsors/msmt.png" alt="MŠMT"></a>
+            <a href="#"><img src="assets/images/sponsors/NSA.png" alt="NSA"></a>
+            <a href="#"><img src="assets/images/sponsors/sportfotbal_logo.png" alt="SportFotbal"></a>
+        </div>
+    </section>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <img src="logo-sk-kostelec.png" alt="SK Kostelec" class="footer-logo">
+                    <p>Tradiční fotbalový klub založený v roce 1921. Zakládáme si na výchově mládeže a férovém sportovním prostředí.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Navigace</h4>
+                    <ul>
+                        <li><a href="index.html">Aktuality</a></li>
+                        <li><a href="soupiska.html">A-Tým (Soupiska)</a></li>
+                        <li><a href="klub.html">O Klubu & Historie</a></li>
+                        <li><a href="kontakt.html">Kontakt & Mapa</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Kontakt</h4>
+                    <p><strong>Adresa:</strong> Sportovní 752, 281 63 Kostelec nad Černými lesy</p>
+                    <p><strong>Email:</strong> skkostelec@seznam.cz</p>
+                    <p><strong>Tel:</strong> +420 739 488 133 (předseda)</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 SK Kostelec nad Černými lesy. Všechna práva vyhrazena.</p>
+            </div>
+        </div>
+    </footer>
+
+    <button id="backToTop" title="Nahoru">↑</button>
+
+    <script>
+        // --- Logika pro Hamburger Menu ---
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => {
+                menuToggle.classList.toggle('active');
+                navLinks.classList.toggle('active');
+                
+                // Zamezení skrolování pozadí při otevřeném menu
+                document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : 'auto';
+            });
+        }
+
+        // Zavření menu po kliknutí na odkaz
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                menuToggle.classList.remove('active');
+                navLinks.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        });
+
+        // --- Načítání detailu článku ---
+        async function loadDetail() {
+            const params = new URLSearchParams(window.location.search);
+            const fileName = params.get('id');
+            
+            if (!fileName) {
+                document.getElementById('article-loader').innerHTML = "<div style='padding:50px'>Článek nebyl nalezen.</div>";
+                return;
+            }
+
+            try {
+                const r = await fetch(`./_posts/${fileName}`);
+                if (!r.ok) throw new Error("Soubor nenalezen");
+                
+                const text = await r.text();
+                const parts = text.split('---');
+                const meta = parts[1];
+                const content = parts[2];
+
+                const titleMatch = meta.match(/title:\s*["']?(.*?)["']?$/m);
+                const title = titleMatch ? titleMatch[1] : "Bez názvu";
+
+                const imgMatch = meta.match(/image:\s*["']?(.*?)["']?$/m);
+                const img = imgMatch ? imgMatch[1] : "";
+
+                const dateMatch = meta.match(/date:\s*["']?(.*?)["']?$/m);
+                const date = dateMatch ? dateMatch[1] : "Datum neuvedeno";
+
+                const descMatch = meta.match(/description:\s*["']?(.*?)["']?$/m);
+                const perex = descMatch ? descMatch[1] : "";
+
+                document.getElementById('article-loader').innerHTML = `
+                    <div class="detail-header">
+                        <a href="index.html" class="back-btn">← Zpět na přehled</a>
+                        <span class="detail-meta">${date}</span>
+                        <h1 class="detail-title">${title}</h1>
+                        <p class="detail-perex">${perex}</p>
+                    </div>
+                    <img src="${img}" class="detail-img">
+                    <div class="detail-body">
+                        <div class="detail-content">${marked.parse(content)}</div>
+                    </div>
+                `;
+                document.title = `${title} | SK Kostelec`;
+            } catch(e) {
+                document.getElementById('article-loader').innerHTML = "<div style='padding:50px'>Chyba při načítání článku.</div>";
+            }
+        }
+        
+        loadDetail();
+
+        // --- Logika pro tlačítko nahoru ---
+        const btt = document.getElementById("backToTop");
+        window.onscroll = function() {
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+                btt.style.display = "block";
+            } else {
+                btt.style.display = "none";
+            }
+        };
+        btt.onclick = function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+    </script>
+</body>
+</html>

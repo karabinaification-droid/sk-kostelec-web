@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil hráče | SK Kostelec nad Černými lesy</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="hrac.css">
+    <style>
+        body { margin: 0; background: #f4f4f4; font-family: 'Inter', sans-serif; display: flex; flex-direction: column; min-height: 100vh; }
+        .page-layout { 
+            display: grid; 
+            grid-template-columns: 280px 1fr; 
+            gap: 40px; 
+            max-width: 1240px; 
+            margin: 40px auto; 
+            padding: 0 20px; 
+            flex: 1;
+            align-items: start;
+        }
+        .player-main-card {
+            background: #fff;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        @media (max-width: 1000px) { 
+            .page-layout { grid-template-columns: 1fr; margin-top: 20px; } 
+            .player-main-card { grid-template-columns: 1fr; padding: 25px; } 
+            aside { order: 2; }
+            main { order: 1; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo-container">
+                <img src="logo-sk-kostelec.png" alt="Logo SK Kostelec" class="main-logo">
+            </div>
+            <button class="menu-toggle" aria-label="Otevřít menu">
+                <span></span><span></span><span></span>
+            </button>
+            <ul class="nav-links">
+                <li><a href="index.html">Aktuality</a></li>
+                <li><a href="soupiska.html">A-Tým</a></li>
+                <li><a href="klub.html">Klub</a></li>
+                <li><a href="kontakt.html">Kontakt</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="page-layout">
+        <aside class="sidebar-section">
+            <h2 class="sidebar-title">A-tým</h2>
+            <div class="sidebar-box">
+                <ul class="sidebar-nav">
+                    <li><a href="soupiska.html">🏃 Soupiska</a></li>
+                    <li><a href="index.html">📊 Tabulka</a></li>
+                    <li><a href="zapasy.html">⚽ Zápasy</a></li>
+                </ul>
+            </div>
+
+            <h2 class="sidebar-title">Ostatní hráči</h2>
+            <div class="sidebar-box">
+                <div id="mini-list" class="mini-player-list"></div>
+            </div>
+        </aside>
+
+        <main>
+            <div class="player-main-card" id="player-loader">
+                <div class="photo-card" id="photo-target"></div>
+                <div id="info-target"></div>
+            </div>
+        </main>
+    </div>
+
+    <section class="partners-section">
+        <h3 class="partners-title">Naši partneři</h3>
+        <div class="partners-container">
+            <a href="#"><img src="assets/images/sponsors/msmt.png" alt="MŠMT"></a>
+            <a href="#"><img src="assets/images/sponsors/NSA.png" alt="NSA"></a>
+            <a href="#"><img src="assets/images/sponsors/sportfotbal_logo.png" alt="SportFotbal"></a>
+        </div>
+    </section>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <img src="logo-sk-kostelec.png" alt="SK Kostelec" class="footer-logo">
+                    <p>Tradiční fotbalový klub založený v roce 1921. Zakládáme si na výchově mládeže a férovém sportovním prostředí.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Navigace</h4>
+                    <ul>
+                        <li><a href="index.html">Aktuality</a></li>
+                        <li><a href="soupiska.html">A-Tým</a></li>
+                        <li><a href="klub.html">Klub</a></li>
+                        <li><a href="kontakt.html">Kontakt</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Kontakt</h4>
+                    <p>Sportovní 752, 281 63 Kostelec nad Černými lesy</p>
+                    <p>Email: skkostelec@seznam.cz</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 SK Kostelec nad Černými lesy. Všechna práva vyhrazena.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <button id="backToTop" title="Nahoru">↑</button>
+
+    <script>
+        // Funkce pro vytvoření URL slugu
+        function createSlug(text) {
+            return text.toString().toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .replace(/\s+/g, '-').replace(/[^\w\-]+/g, '')
+                .replace(/\-\-+/g, '-').trim();
+        }
+
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => {
+                menuToggle.classList.toggle('active');
+                navLinks.classList.toggle('active');
+            });
+        }
+
+        // Seznam souborů (v ostré verzi lze generovat dynamicky)
+        const PLAYER_FILES = ['adam-frůhauf.json', 'jaroslav-kaše.json', 'justin-crighton.json', 'milan-klimt.json', 'petr-pojezny.json', 'vojta-hanzlik.json'];
+        
+        async function init() {
+            const params = new URLSearchParams(window.location.search);
+            const currentSlug = params.get('player'); 
+            const miniList = document.getElementById('mini-list');
+            let currentData = null;
+
+            miniList.innerHTML = "";
+            for (const file of PLAYER_FILES) {
+                try {
+                    const res = await fetch(`./_data/players/${file}`);
+                    if (res.ok) {
+                        const p = await res.json();
+                        const slug = createSlug(p.title);
+                        const isActive = slug === currentSlug ? 'active' : '';
+                        
+                        // Generování bočního seznamu
+                        miniList.innerHTML += `<a href="hrac.html?player=${slug}" class="mini-player-item ${isActive}"><b>#${p.number || '??'}</b> ${p.title}</a>`;
+                        
+                        if (slug === currentSlug) {
+                            currentData = p;
+                        }
+                    }
+                } catch(e) { console.error("Chyba při načítání souboru:", file); }
+            }
+
+            if (currentData) {
+                const nameParts = currentData.title.split(' ');
+                document.getElementById('photo-target').innerHTML = `<img src="${currentData.image || 'logo-sk-kostelec.png'}" class="player-main-photo" style="width:100%; border-radius:10px;">`;
+                
+                // Vykreslení hlavní karty s daty z config.yml
+                document.getElementById('info-target').innerHTML = `
+                    <div class="stats-header">
+                        <div class="number-badge">${currentData.number || '??'}</div>
+                        <div class="name-container">
+                            <span class="p-first-name">${nameParts[0]}</span>
+                            <span class="p-last-name">${nameParts.slice(1).join(' ')}</span>
+                            <span class="p-highlight">${currentData.position || 'HRÁČ'}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="player-stats-row">
+                        <div class="stat-item"><strong>Zápasy</strong> <span>${currentData.matches_count || '0'}</span></div>
+                        <div class="stat-item"><strong>Góly</strong> <span>${currentData.goals || '0'}</span></div>
+                        <div class="stat-item"><strong>Asistence</strong> <span>${currentData.assists || '0'}</span></div>
+                    </div>
+
+                    <div class="personal-details">
+                        <h3>Osobní údaje</h3>
+                        <ul style="list-style:none; padding:0; margin:0;">
+                            <li style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #f9f9f9; max-width:300px;">
+                                <span>Narozen:</span> <strong>${currentData.born || '--'}</strong>
+                            </li>
+                            <li style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #f9f9f9; max-width:300px;">
+                                <span>Výška:</span> <strong>${currentData.height || '--'} cm</strong>
+                            </li>
+                            <li style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #f9f9f9; max-width:300px;">
+                                <span>Váha:</span> <strong>${currentData.weight || '--'} kg</strong>
+                            </li>
+                        </ul>
+                    </div>
+                `;
+                document.title = `${currentData.title} | SK Kostelec`;
+            } else if (currentSlug) {
+                document.getElementById('info-target').innerHTML = `<h2>Hráč nenalezen</h2><p>Profil hráče ${currentSlug} neexistuje.</p>`;
+            }
+        }
+        
+        init();
+
+        const btt = document.getElementById("backToTop");
+        window.onscroll = function() {
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) { btt.style.display = "block"; } else { btt.style.display = "none"; }
+        };
+        btt.onclick = function() { window.scrollTo({ top: 0, behavior: 'smooth' }); };
+    </script>
+</body>
+</html>

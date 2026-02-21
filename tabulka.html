@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabulka A-Třída | SK Kostelec nad Černými lesy</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="tabulka.css">
+</head>
+<body>
+
+    <header>
+        <nav class="navbar">
+            <div class="logo-container">
+                <img src="logo-sk-kostelec.png" alt="Logo SK Kostelec" class="main-logo">
+            </div>
+            <button class="menu-toggle" aria-label="Otevřít menu">
+                <span></span><span></span><span></span>
+            </button>
+            <ul class="nav-links">
+                <li><a href="index.html">Aktuality</a></li>
+                <li><a href="soupiska.html">A-Tým</a></li>
+                <li><a href="klub.html">Klub</a></li>
+                <li><a href="kontakt.html">Kontakt</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="page-layout container">
+        <aside class="sidebar-section">
+            <h2 class="section-title">A-Tým</h2>
+            <div class="sidebar-box">
+                <ul class="sidebar-nav">
+                    <li><a href="soupiska.html">🏃 Soupiska</a></li>
+                    <li><a href="tabulka.html" class="active">📊 Tabulka</a></li>
+                    <li><a href="zapasy.html">⚽ Zápasy</a></li>
+                </ul>
+            </div>
+        </aside>
+        
+        <main class="club-content">
+            <h2 class="main-title">Tabulka A-Třída</h2>
+            <div class="table-responsive">
+                <table class="league-page-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th style="text-align:left">Tým</th>
+                            <th class="mobile-hide">Z</th>
+                            <th class="mobile-hide">V</th>
+                            <th class="mobile-hide">R</th>
+                            <th class="mobile-hide">P</th>
+                            <th class="mobile-hide">Skóre</th>
+                            <th class="mobile-hide">Rozdíl</th>
+                            <th>B</th>
+                        </tr>
+                    </thead>
+                    <tbody id="league-table-body">
+                        <tr><td colspan="9">Počítám aktuální tabulku...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-legend">
+                <h3>Vysvětlivky</h3>
+                <div class="legend-grid">
+                    <div class="legend-item"><strong>Z</strong> Počet zápasů</div>
+                    <div class="legend-item"><strong>V</strong> Výhry</div>
+                    <div class="legend-item"><strong>R</strong> Remízy</div>
+                    <div class="legend-item"><strong>P</strong> Prohry</div>
+                    <div class="legend-item"><strong>Skóre</strong> Vstřelené : Obdržené góly</div>
+                    <div class="legend-item"><strong>Rozdíl</strong> Rozdíl ve skóre</div>
+                    <div class="legend-item"><strong>B</strong> Celkový počet bodů</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <section class="partners-section">
+        <h3 class="partners-title">Naši partneři</h3>
+        <div class="partners-container">
+            <a href="#"><img src="assets/images/sponsors/msmt.png" alt="MŠMT"></a>
+            <a href="#"><img src="assets/images/sponsors/NSA.png" alt="NSA"></a>
+            <a href="#"><img src="assets/images/sponsors/sportfotbal_logo.png" alt="SportFotbal"></a>
+        </div>
+    </section>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <img src="logo-sk-kostelec.png" alt="SK Kostelec" class="footer-logo">
+                    <p>Tradiční fotbalový klub založený v roce 1921. Zakládáme si na výchově mládeže a férovém sportovním prostředí.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Navigace</h4>
+                    <ul>
+                        <li><a href="index.html">Aktuality</a></li>
+                        <li><a href="soupiska.html">A-Tým</a></li>
+                        <li><a href="klub.html">Klub</a></li>
+                        <li><a href="kontakt.html">Kontakt</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Kontakt</h4>
+                    <p>Sportovní 752, 281 63 Kostelec nad Černými lesy</p>
+                    <p>Email: skkostelec@seznam.cz</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 SK Kostelec nad Černými lesy. Všechna práva vyhrazena.</p>
+            </div>
+        </div>
+    </footer>
+
+    <button id="backToTop" title="Nahoru">↑</button>
+
+    <script>
+        // Nastavení - seznam souborů pro simulaci složek na lokálu
+        const TEAM_FILES = ['kostelec.json', 'pacov.json', 'cestlice.json', 'lounovice.json', 'mukarov.json', 'svojetice.json', 'dobrejovice.json', 'krizky.json', 'ondrejov.json', 'kunice.json', 'mirosovice.json', 'mnichovice.json', 'kamenice.json', 'skalice.json'];
+        const MATCH_FILES = ['match-2026-02-20.json', 'match-2026-02-21.json']; // Zde budou přibývat soubory z adminu
+
+        async function init() {
+            await generateLeagueTable();
+        }
+
+        async function generateLeagueTable() {
+            const tableBody = document.getElementById('league-table-body');
+            try {
+                let stats = {};
+
+                // 1. Načtení týmů
+                for (const file of TEAM_FILES) {
+                    const res = await fetch(`./_data/teams/${file}`);
+                    if (res.ok) {
+                        const t = await res.json();
+                        stats[t.id] = { 
+                            title: t.title, 
+                            logo: t.logo, 
+                            z: 0, v: 0, r: 0, p: 0, gf: 0, ga: 0, b: 0 
+                        };
+                    }
+                }
+
+                // 2. Načtení odehraných zápasů a výpočet bodů
+                for (const file of MATCH_FILES) {
+                    const res = await fetch(`./_data/matches/${file}`);
+                    if (res.ok) {
+                        const m = await res.json();
+                        // Počítáme jen odehrané zápasy s vyplněným skóre
+                        if (m.played && stats[m.home_id] && stats[m.away_id]) {
+                            const h = stats[m.home_id];
+                            const a = stats[m.away_id];
+
+                            h.z++; a.z++;
+                            h.gf += parseInt(m.home_score);
+                            h.ga += parseInt(m.away_score);
+                            a.gf += parseInt(m.away_score);
+                            a.ga += parseInt(m.home_score);
+
+                            if (parseInt(m.home_score) > parseInt(m.away_score)) {
+                                h.v++; h.b += 3; a.p++;
+                            } else if (parseInt(m.home_score) < parseInt(m.away_score)) {
+                                a.v++; a.b += 3; h.p++;
+                            } else {
+                                h.r++; a.r++; h.b += 1; a.b += 1;
+                            }
+                        }
+                    }
+                }
+
+                // 3. Seřazení (body -> rozdíl skóre -> vstřelené góly)
+                const sorted = Object.values(stats).sort((a, b) => {
+                    if (b.b !== a.b) return b.b - a.b;
+                    const diffA = a.gf - a.ga;
+                    const diffB = b.gf - b.ga;
+                    if (diffB !== diffA) return diffB - diffA;
+                    return b.gf - a.gf;
+                });
+
+                // 4. Vykreslení
+                tableBody.innerHTML = sorted.map((row, i) => {
+                    const diff = row.gf - row.ga;
+                    const isKostelec = row.title.includes("SK Kostelec nad Černými lesy");
+                    
+                    return `
+                        <tr class="${isKostelec ? 'highlight-me' : ''}">
+                            <td class="col-rank">${i + 1}.</td>
+                            <td style="text-align:left">
+                                <div class="team-info" style="display:flex; align-items:center; gap:10px;">
+                                    <img src="${row.logo}" alt="" class="team-logo" style="width:25px; height:25px; object-fit:contain;">
+                                    <span class="team-name">${row.title}</span>
+                                </div>
+                            </td>
+                            <td class="mobile-hide">${row.z}</td>
+                            <td class="mobile-hide">${row.v}</td>
+                            <td class="mobile-hide">${row.r}</td>
+                            <td class="mobile-hide">${row.p}</td>
+                            <td class="mobile-hide">${row.gf}:${row.ga}</td>
+                            <td class="mobile-hide">${diff > 0 ? '+' + diff : diff}</td>
+                            <td class="col-points" style="font-weight:bold; color:#0033ff;">${row.b}</td>
+                        </tr>
+                    `;
+                }).join('');
+
+            } catch (e) {
+                console.error(e);
+                tableBody.innerHTML = '<tr><td colspan="9">Chyba při načítání dat.</td></tr>';
+            }
+        }
+
+        init();
+
+        // UI obsluha menu
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => {
+                menuToggle.classList.toggle('active');
+                navLinks.classList.toggle('active');
+            });
+        }
+        
+        const btt = document.getElementById("backToTop");
+        window.onscroll = function() {
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) { btt.style.display = "block"; } else { btt.style.display = "none"; }
+        };
+        btt.onclick = function() { window.scrollTo({ top: 0, behavior: 'smooth' }); };
+    </script>
+</body>
+</html>

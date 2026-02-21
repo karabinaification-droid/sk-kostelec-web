@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kontakt | SK Kostelec nad Černými lesy</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 60px; }
+        .contact-card { background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); border-top: 5px solid var(--club-blue); }
+        .contact-card h2 { text-transform: uppercase; font-weight: 900; margin-bottom: 25px; font-size: 1.5rem; color: var(--dark); }
+        .info-row { display: flex; margin-bottom: 20px; align-items: flex-start; }
+        .info-label { width: 130px; font-weight: bold; color: var(--club-blue); text-transform: uppercase; font-size: 0.85rem; }
+        .info-value { flex: 1; color: #333; font-size: 1rem; line-height: 1.5; }
+        .info-value strong { display: block; color: #000; margin-bottom: 5px; }
+        
+        .map-strip { 
+            width: 100vw; 
+            height: 450px; 
+            position: relative; 
+            left: 50%; 
+            right: 50%; 
+            margin-left: -50vw; 
+            margin-right: -50vw; 
+            filter: grayscale(0.2); 
+            border-top: 2px solid var(--club-yellow); 
+            border-bottom: 2px solid var(--club-yellow); 
+            overflow: hidden; 
+        }
+        .map-strip iframe { width: 100%; height: 100%; border: 0; }
+        
+        @media (max-width: 850px) { 
+            .contact-grid { grid-template-columns: 1fr; } 
+            .map-strip { height: 350px; } 
+            .contact-card { padding: 25px; }
+            .info-label { width: 100px; font-size: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo-container">
+                <img src="logo-sk-kostelec.png" alt="Logo SK Kostelec" class="main-logo">
+            </div>
+
+            <button class="menu-toggle" aria-label="Otevřít menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <ul class="nav-links">
+                <li><a href="index.html">Aktuality</a></li>
+                <li><a href="soupiska.html">A-Tým</a></li>
+                <li><a href="klub.html">Klub</a></li>
+                <li><a href="kontakt.html">Kontakt</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container" style="margin-top: 60px;">
+        <h1 class="section-title">Kontaktní údaje</h1>
+        
+        <div class="contact-grid">
+            <div class="contact-card">
+                <h2>Oficiální údaje</h2>
+                <div class="info-row">
+                    <span class="info-label">Název</span>
+                    <span class="info-value"><strong>Sportovní klub Kostelec nad Černými lesy, z.s.</strong></span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Sídlo</span>
+                    <span class="info-value">Sportovní 752<br>281 63 Kostelec nad Černými lesy</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">IČO / DIČ</span>
+                    <span class="info-value">66492947 / CZ 66492947</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Bankovní účet</span>
+                    <span class="info-value">256281950 / 0300 (ČSOB)</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Příspěvky</span>
+                    <span class="info-value">2202171413 / 2010 (Fio banka)</span>
+                </div>
+            </div>
+
+            <div class="contact-card">
+                <h2>Vedení klubu</h2>
+                <div class="info-row">
+                    <span class="info-label">Předseda</span>
+                    <span class="info-value">
+                        <strong>Jiří Vedral</strong>
+                        Tel: +420 739 488 133<br>
+                        Email: jirivedral@centrum.cz
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Sekretář</span>
+                    <span class="info-value">
+                        <strong>Martin Kohout</strong>
+                        Email: info@sk-kostelecncl.cz
+                    </span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Doručování</span>
+                    <span class="info-value">Sportovní 752<br>281 63 Kostelec n. Č. l.</span>
+                </div>
+            </div>
+        </div>
+    </main>
+    <section class="partners-section">
+        <h3 class="partners-title">Naši partneři</h3>
+        <div class="partners-container">
+            <a href="#"><img src="assets/images/sponsors/msmt.png" alt="MŠMT"></a>
+            <a href="#"><img src="assets/images/sponsors/NSA.png" alt="NSA"></a>
+            <a href="#"><img src="assets/images/sponsors/sportfotbal_logo.png" alt="SportFotbal"></a>
+        </div>
+    </section>
+    <div class="map-strip">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2565.48512534563!2d14.8585!3d50.0000!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNTDCsDAwJzAwLjAiTiAxNMKwNTEnMzAuNiJF!5e0!3m2!1scs!2scz!4v1614000000000!5m2!1scs!2scz" allowfullscreen="" loading="lazy"></iframe>
+    </div>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <img src="logo-sk-kostelec.png" alt="SK Kostelec" class="footer-logo">
+                    <p>Tradiční fotbalový klub založený v roce 1921. Zakládáme si na výchově mládeže a férovém sportovním prostředí.</p>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Navigace</h4>
+                    <ul>
+                        <li><a href="index.html">Aktuality</a></li>
+                        <li><a href="soupiska.html">A-Tým (Soupiska)</a></li>
+                        <li><a href="klub.html">O Klubu & Historie</a></li>
+                        <li><a href="kontakt.html">Kontakt & Mapa</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Kontakt</h4>
+                    <p><strong>Adresa:</strong> Sportovní 752, 281 63 Kostelec nad Černými lesy</p>
+                    <p><strong>Email:</strong> skkostelec@seznam.cz</p>
+                    <p><strong>Tel:</strong> +420 739 488 133 (předseda)</p>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>© 2026 SK Kostelec nad Černými lesy. Všechna práva vyhrazena.</p>
+            </div>
+        </div>
+    </footer>
+
+    <button id="backToTop" title="Nahoru">↑</button>
+
+    <script>
+        // Logika pro Hamburger Menu
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => {
+                menuToggle.classList.toggle('active');
+                navLinks.classList.toggle('active');
+                document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : 'auto';
+            });
+        }
+
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                menuToggle.classList.remove('active');
+                navLinks.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            });
+        });
+
+        // Logika pro tlačítko nahoru
+        const backToTop = document.getElementById("backToTop");
+        window.onscroll = function() {
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+                backToTop.style.display = "block";
+            } else {
+                backToTop.style.display = "none";
+            }
+        };
+        backToTop.onclick = function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+    </script>
+</body>
+</html>

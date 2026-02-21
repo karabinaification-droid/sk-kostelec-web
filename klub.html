@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O klubu | SK Kostelec nad Černými lesy</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="klub.css">
+</head>
+<body>
+
+    <header>
+        <nav class="navbar">
+            <div class="logo-container">
+                <img src="logo-sk-kostelec.png" alt="Logo SK Kostelec" class="main-logo">
+            </div>
+            <button class="menu-toggle" aria-label="Otevřít menu">
+                <span></span><span></span><span></span>
+            </button>
+            <ul class="nav-links">
+                <li><a href="index.html">Aktuality</a></li>
+                <li><a href="soupiska.html">A-Tým</a></li>
+                <li><a href="klub.html" class="active">Klub</a></li>
+                <li><a href="kontakt.html">Kontakt</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="page-layout container">
+        <aside class="sidebar-section">
+            <h2 class="section-title">O klubu</h2>
+            <div class="sidebar-box">
+                <ul class="sidebar-nav">
+                    <li><a href="klub.html" class="active">📜 Historie</a></li>
+                    <li><a href="vedeni.html">👔 Vedení klubu</a></li>
+                    <li><a href="stadion.html">🏟️ Stadion</a></li>
+                </ul>
+            </div>
+        </aside>
+        
+        <main class="club-content">
+            <h2 class="main-title">Historie SK Kostelec</h2>
+            
+            <section class="club-section">
+                <p class="lead-text">SK Kostelec nad Černými lesy je fotbalový klub s bohatou tradicí, jejíž kořeny sahají až do roku 1921.</p>
+                
+                <div class="content-block">
+                    <h3>Založení a počátky</h3>
+                    <p>Klub byl založen nadšenci do sportu v meziválečném období. Od svých počátků se stal centrem sportovního dění v Kostelci a okolí. První zápasy se odehrávaly na provizorních hřištích, dokud klub nezískal své stálé zázemí.</p>
+                </div>
+
+                <div class="image-placeholder-box">
+                    <p>Sem můžeš vložit historickou fotografii týmu</p>
+                </div>
+
+                <div class="content-block">
+                    <h3>Současnost</h3>
+                    <p>Dnes se SK Kostelec zaměřuje především na stabilizaci kádru A-týmu v krajských soutěžích a na systematickou práci s mládeží. Naším cílem je vychovávat novou generaci fotbalistů, kteří budou hrdě reprezentovat černočerné barvy.</p>
+                </div>
+
+                <div class="club-stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-number">1921</span>
+                        <span class="stat-label">Rok založení</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">100+</span>
+                        <span class="stat-label">Členů klubu</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">A-Tým</span>
+                        <span class="stat-label">Hlavní kategorie</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <section class="partners-section">
+        <h3 class="partners-title">Naši partneři</h3>
+        <div class="partners-container">
+            <a href="#"><img src="assets/images/sponsors/msmt.png" alt="MŠMT"></a>
+            <a href="#"><img src="assets/images/sponsors/NSA.png" alt="NSA"></a>
+            <a href="#"><img src="assets/images/sponsors/sportfotbal_logo.png" alt="SportFotbal"></a>
+        </div>
+    </section>
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <img src="logo-sk-kostelec.png" alt="SK Kostelec" class="footer-logo">
+                    <p>Tradiční fotbalový klub založený v roce 1921. Zakládáme si na výchově mládeže a férovém sportovním prostředí.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Navigace</h4>
+                    <ul>
+                        <li><a href="index.html">Aktuality</a></li>
+                        <li><a href="soupiska.html">A-Tým</a></li>
+                        <li><a href="klub.html">Klub</a></li>
+                        <li><a href="kontakt.html">Kontakt</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Kontakt</h4>
+                    <p>Sportovní 752, 281 63 Kostelec nad Černými lesy</p>
+                    <p>Email: skkostelec@seznam.cz</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 SK Kostelec nad Černými lesy. Všechna práva vyhrazena.</p>
+            </div>
+        </div>
+    </footer>
+
+    <button id="backToTop" title="Nahoru">↑</button>
+
+    <script>
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => {
+                menuToggle.classList.toggle('active');
+                navLinks.classList.toggle('active');
+            });
+        }
+    </script>
+</body>
+</html>

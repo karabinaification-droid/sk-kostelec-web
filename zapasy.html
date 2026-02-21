@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zápasy A-Tým | SK Kostelec nad Černými lesy</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="zapasy.css">
+</head>
+<body>
+
+    <header>
+        <nav class="navbar">
+            <div class="logo-container">
+                <img src="logo-sk-kostelec.png" alt="Logo SK Kostelec" class="main-logo">
+            </div>
+            <button class="menu-toggle" aria-label="Otevřít menu">
+                <span></span><span></span><span></span>
+            </button>
+            <ul class="nav-links">
+                <li><a href="index.html">Aktuality</a></li>
+                <li><a href="soupiska.html">A-Tým</a></li>
+                <li><a href="klub.html">Klub</a></li>
+                <li><a href="kontakt.html">Kontakt</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="page-layout container">
+        <aside class="sidebar-section">
+            <h2 class="section-title">A-Tým</h2>
+            <div class="sidebar-box">
+                <ul class="sidebar-nav">
+                    <li><a href="soupiska.html">🏃 Soupiska</a></li>
+                    <li><a href="tabulka.html">📊 Tabulka</a></li>
+                    <li><a href="zapasy.html" class="active">⚽ Zápasy</a></li>
+                </ul>
+            </div>
+        </aside>
+        
+        <main class="club-content">
+            <h2 class="main-title">Zápasy SK Kostelec</h2>
+            <div id="matches-container">
+                <p>Načítám kompletní rozpis a výsledky...</p>
+            </div>
+        </main>
+    </div>
+
+    <section class="partners-section">
+        <h3 class="partners-title">Naši partneři</h3>
+        <div class="partners-container">
+            <a href="#"><img src="assets/images/sponsors/msmt.png" alt="MŠMT"></a>
+            <a href="#"><img src="assets/images/sponsors/NSA.png" alt="NSA"></a>
+            <a href="#"><img src="assets/images/sponsors/sportfotbal_logo.png" alt="SportFotbal"></a>
+        </div>
+    </section>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <img src="logo-sk-kostelec.png" alt="SK Kostelec" class="footer-logo">
+                    <p>Tradiční fotbalový klub založený v roce 1921. Zakládáme si na výchově mládeže a férovém sportovním prostředí.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Navigace</h4>
+                    <ul>
+                        <li><a href="index.html">Aktuality</a></li>
+                        <li><a href="soupiska.html">A-Tým</a></li>
+                        <li><a href="klub.html">Klub</a></li>
+                        <li><a href="kontakt.html">Kontakt</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Kontakt</h4>
+                    <p>Sportovní 752, 281 63 Kostelec nad Černými lesy</p>
+                    <p>Email: skkostelec@seznam.cz</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 SK Kostelec nad Černými lesy. Všechna práva vyhrazena.</p>
+            </div>
+        </div>
+    </footer>
+
+    <button id="backToTop" title="Nahoru">↑</button>
+
+    <script>
+        const IS_LOCAL = true; 
+        const KOSTELEC_ID = 'kostelec';
+
+        // Pomocná funkce pro načítání souborů
+        async function fetchFile(path) {
+            try {
+                const res = await fetch(path);
+                return res.ok ? await res.json() : null;
+            } catch (e) { return null; }
+        }
+
+        async function initMatches() {
+            const container = document.getElementById('matches-container');
+            
+            try {
+                // 1. Načtení týmů pro názvy a loga
+                const teamFiles = ['kostelec.json', 'pacov.json', 'cestlice.json', 'lounovice.json', 'mukarov.json', 'svojetice.json', 'dobrejovice.json', 'krizky.json', 'ondrejov.json', 'kunice.json', 'mirosovice.json', 'mnichovice.json', 'kamenice.json', 'skalice.json'];
+                let teams = {};
+                for (let f of teamFiles) {
+                    const t = await fetchFile(`./_data/teams/${f}`);
+                    if (t) teams[t.id] = t;
+                }
+
+                // 2. Načtení všech zápasů
+                const matchFiles = ['match-2026-02-20.json', 'match-2026-02-21.json', 'match-2026-03-01.json'];
+                let matches = [];
+                for (let f of matchFiles) {
+                    const m = await fetchFile(`./_data/matches/${f}`);
+                    if (m) matches.push(m);
+                }
+
+                // Filtrovat zápasy Kostelce a seřadit je od nejnovějšího (odehrané nahoře)
+                const kostelecMatches = matches
+                    .filter(m => m.home_id === KOSTELEC_ID || m.away_id === KOSTELEC_ID)
+                    .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                // Najít příští zápas (nejbližší budoucí, který se ještě nehrál)
+                const upcoming = matches
+                    .filter(m => !m.played && (m.home_id === KOSTELEC_ID || m.away_id === KOSTELEC_ID))
+                    .sort((a, b) => new Date(a.date) - new Date(b.date))[0];
+
+                let html = '';
+
+                // Pokud existuje příští zápas, vykreslíme ho jako první (zvýrazněný)
+                if (upcoming) {
+                    const hTeam = teams[upcoming.home_id];
+                    const aTeam = teams[upcoming.away_id];
+                    const d = new Date(upcoming.date);
+                    
+                    html += `
+                        <div class="match-row upcoming">
+                            <div class="match-meta">
+                                <span class="m-date">${d.toLocaleDateString('cs-CZ')} | ${d.toLocaleTimeString('cs-CZ', {hour: '2-digit', minute:'2-digit'})}</span>
+                                <span class="m-badge">PŘÍŠTÍ ZÁPAS</span>
+                            </div>
+                            <div class="match-main">
+                                <div class="m-team home">
+                                    <span class="team-name">${hTeam ? hTeam.title : upcoming.home_id}</span>
+                                    <img src="${hTeam ? hTeam.logo : 'logo-sk-kostelec.png'}" class="m-logo">
+                                </div>
+                                <div class="m-score upcoming">VS</div>
+                                <div class="m-team away">
+                                    <img src="${aTeam ? aTeam.logo : 'logo-sk-kostelec.png'}" class="m-logo">
+                                    <span class="team-name">${aTeam ? aTeam.title : upcoming.away_id}</span>
+                                </div>
+                            </div>
+                            <div style="text-align:center; font-size: 0.9rem; color: #666; margin-top: 10px;">
+                                Místo: ${upcoming.location || 'Bude upřesněno'}
+                            </div>
+                        </div>
+                        <h3 style="margin: 40px 0 20px; text-transform: uppercase; font-family: 'Oswald';">Odehraná utkání</h3>
+                    `;
+                }
+
+                // Vykreslení odehraných zápasů
+                html += kostelecMatches.filter(m => m.played).map(m => {
+                    const hTeam = teams[m.home_id] || { title: m.home_id, logo: "" };
+                    const aTeam = teams[m.away_id] || { title: m.away_id, logo: "" };
+                    const d = new Date(m.date);
+                    
+                    // Barvení výsledku
+                    let scoreClass = '';
+                    const isHome = m.home_id === KOSTELEC_ID;
+                    if (m.home_score > m.away_score) scoreClass = isHome ? 'win' : 'loss';
+                    else if (m.home_score < m.away_score) scoreClass = isHome ? 'loss' : 'win';
+
+                    // Zpracování střelců
+                    let scorersHtml = '';
+                    if (m.scorers && m.scorers.length > 0) {
+                        scorersHtml = `<div class="m-scorers">⚽ Střelci: ${m.scorers.join(', ')}</div>`;
+                    }
+
+                    return `
+                        <div class="match-row">
+                            <div class="match-meta">
+                                <span class="m-date">${d.toLocaleDateString('cs-CZ')}</span>
+                                <span class="m-info">A-Třída | Poločas (${m.half_home}:${m.half_away})</span>
+                            </div>
+                            <div class="match-main">
+                                <div class="m-team home">
+                                    <span class="team-name">${hTeam.title}</span>
+                                    <img src="${hTeam.logo}" class="m-logo">
+                                </div>
+                                <div class="m-score ${scoreClass}">${m.home_score}:${m.away_score}</div>
+                                <div class="m-team away">
+                                    <img src="${aTeam.logo}" class="m-logo">
+                                    <span class="team-name">${aTeam.title}</span>
+                                </div>
+                            </div>
+                            ${scorersHtml}
+                        </div>
+                    `;
+                }).join('');
+
+                container.innerHTML = html;
+
+            } catch(e) {
+                console.error(e);
+                container.innerHTML = '<p>Data zápasů se nepodařilo načíst.</p>';
+            }
+        }
+
+        initMatches();
+
+        // UI logiky pro menu
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => {
+                menuToggle.classList.toggle('active');
+                navLinks.classList.toggle('active');
+            });
+        }
+        
+        const btt = document.getElementById("backToTop");
+        window.onscroll = function() {
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) { btt.style.display = "block"; } else { btt.style.display = "none"; }
+        };
+        btt.onclick = function() { window.scrollTo({ top: 0, behavior: 'smooth' }); };
+    </script>
+</body>
+</html>

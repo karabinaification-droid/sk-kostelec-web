@@ -1,0 +1,123 @@
+/* clanek.css - LUXUSNÍ SPORTOVNÍ STYL PRO DETAIL ČLÁNKU */
+
+/* 1. ZÁKLADNÍ KONTEJNER ČLÁNKU */
+.article-detail-wrapper { 
+    max-width: 900px; 
+    margin: 60px auto; 
+    background: #fff; 
+    border-radius: 15px; 
+    overflow: hidden; 
+    box-shadow: 0 15px 50px rgba(0,0,0,0.08); 
+    font-family: 'Inter', sans-serif;
+}
+
+/* 2. HLAVIČKA (Nadpis, Datum, Perex) */
+.detail-header { 
+    padding: 60px 60px 40px 60px; 
+    display: flex;
+    flex-direction: column;
+}
+
+/* Zpětné tlačítko - protažený Oswald */
+.back-btn { 
+    display: inline-block; 
+    margin-bottom: 30px; 
+    color: #0033ff; 
+    text-decoration: none; 
+    font-family: 'Oswald', sans-serif;
+    font-weight: 400; 
+    text-transform: uppercase; 
+    font-size: 0.9rem; 
+    letter-spacing: 1px;
+    transition: 0.3s;
+}
+
+.back-btn:hover { color: #000; transform: translateX(-5px); }
+
+/* Datum - FIX: Zvětšen margin, aby protažený nadpis do data nezasahoval */
+.detail-meta { 
+    color: #0033ff; 
+    font-weight: 600; 
+    font-size: 0.85rem; 
+    margin-bottom: 25px; 
+    display: block; 
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* PROTAŽENÝ HLAVNÍ NADPIS - OSWALD */
+.detail-title { 
+    font-family: 'Oswald', sans-serif;
+    font-size: 3.2rem; 
+    font-weight: 700; 
+    line-height: 1.1; 
+    margin-bottom: 10px; 
+    color: #1a1a1a; 
+    text-transform: uppercase; 
+    display: block;
+    transform: scaleY(1.35); /* Agresivnější protažení pro luxusní vzhled */
+    transform-origin: left center; /* FIX: Roztahuje se od středu, neletí jen nahoru */
+}
+
+/* Perex - zjemněný Inter */
+.detail-perex { 
+    font-size: 1.3rem; 
+    line-height: 1.6; 
+    color: #4a4a4a; 
+    margin-top: 45px; /* FIX: Větší mezera kvůli protaženému nadpisu nahoře */
+    margin-bottom: 10px; 
+    font-weight: 500; 
+}
+
+/* 3. OBRÁZEK ČLÁNKU */
+.detail-img { 
+    width: 100%; 
+    height: auto; 
+    max-height: 550px; 
+    object-fit: cover; 
+    display: block;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+}
+
+/* 4. TĚLO ČLÁNKU */
+.detail-body { 
+    padding: 60px; 
+}
+
+.detail-content { 
+    line-height: 1.8; 
+    font-size: 1.15rem; 
+    color: #333; 
+    font-weight: 400; /* Lehké písmo pro čtení */
+}
+
+.detail-content p { 
+    margin-bottom: 25px; 
+}
+
+/* Nadpisy v textu */
+.detail-content h2, 
+.detail-content h3 {
+    font-family: 'Oswald', sans-serif;
+    text-transform: uppercase;
+    color: #1a1a1a;
+    margin-top: 50px;
+    margin-bottom: 20px;
+    transform: scaleY(1.2);
+    transform-origin: left;
+    letter-spacing: 0.5px;
+}
+
+/* 5. RESPONZIVITA (MOBIL) */
+@media (max-width: 1000px) {
+    .article-detail-wrapper { margin: 20px 10px; border-radius: 12px; }
+    .detail-header, .detail-body { padding: 40px 25px; }
+    
+    .detail-title { 
+        font-size: 2.2rem; 
+        transform: scaleY(1.15); 
+    }
+    
+    .detail-perex { font-size: 1.15rem; margin-top: 25px; }
+}
