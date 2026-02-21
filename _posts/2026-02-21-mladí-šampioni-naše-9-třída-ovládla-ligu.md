@@ -1,0 +1,14 @@
+---
+title: "Mladí šampioni: Naše 9. třída ovládla ligu!"
+featured: true
+date: 2026-02-21T09:05:00.000+01:00
+category: Mládež
+image: https://www.betarena.cz/obrazek/webp/5917165173820-fotbal-ms-ve-fotbale-2006-italie-s-poharem-pro-viteze-zdroj-ph.fab-shutterstock.com_590x393.webp
+---
+Naše mládežnická základna opět ukázala svou sílu. Tým starších žáků (U15) dokázal nemožné – během celé jarní části neztratil ani jeden bod a s předstihem dvou kol si zajistil mistrovský titul.\
+
+Cesta za zlatem přitom nebyla jednoduchá. Klíčový moment přišel před čtrnácti dny v přímém souboji o první místo na hřišti největšího rivala. Naši borci tam sice prohrávali o dvě branky, ale díky neuvěřitelné bojovnosti v posledních deseti minutách skóre otočili.\
+
+Trenéři vyzdvihují především týmového ducha: *\*"Nemáme v týmu jen jednu hvězdu, na kterou bychom spoléhali. Každý kluk na hřišti ví, co má dělat, a jeden bojuje za druhého."\** \
+\
+Klub už nyní plánuje pro čerstvé mistry slavnostní vyhlášení spojené s přátelským utkáním proti týmu rodičů.
