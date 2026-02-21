@@ -1,8 +1,11 @@
 ---
 title: "Velké změny v areálu: Chystáme nové travnaté hřiště"
-image: "https://1gr.cz/fotky/idnes/23/051/cl5/GRRcd7e_IMG_0458.JPG"
-date: "18. únor 2026"
-description: "Modernizace zázemí pokračuje. Startujeme projekt pokládky nového trávníku s automatickou závlahou."
+type: featured
+date: 2026-02-21T17:42:00.000+01:00
+category: Klub
+image: https://1gr.cz/fotky/idnes/23/051/cl5/GRRcd7e_IMG_0458.JPG
+description: Modernizace zázemí pokračuje. Startujeme projekt pokládky nového
+  trávníku s automatickou závlahou.
 featured: true
 ---
 Vedení SK Kostelec oficiálně potvrdilo největší investici do sportovní infrastruktury za posledních deset let. Stávající hlavní plocha, která už v letních měsících trpěla suchem a nerovnostmi, projde kompletní rekonstrukcí.
