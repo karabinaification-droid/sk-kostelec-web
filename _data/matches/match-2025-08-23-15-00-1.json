@@ -1,7 +1,15 @@
 {
-  "home_id": "kamenice",
-  "away_id": "kostelec",
-  "home_score": 0,
   "away_score": 6,
-  "date": "2025-08-23T17:00:00.000+02:00"
+  "half_home": 0,
+  "away_id": "kostelec",
+  "date": "2025-08-23T17:00:00.000+02:00",
+  "home_score": 0,
+  "scorers": [
+    "Adam Frűhauf",
+    "Petr Pojezný"
+  ],
+  "played": true,
+  "location": "Kamenice",
+  "half_away": 3,
+  "home_id": "kamenice"
 }
