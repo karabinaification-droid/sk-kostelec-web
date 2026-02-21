@@ -1,6 +1,7 @@
 ---
 title: "HISTORICKÝ ÚSPĚCH: Kostelec postupuje do vyšší soutěže!"
 featured: true
+type: featured
 date: 2026-02-21T09:06:00.000+01:00
 category: A-Tým
 image: https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1200

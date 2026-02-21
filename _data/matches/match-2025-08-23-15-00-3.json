@@ -1,7 +1,11 @@
 {
-  "home_id": "pacov",
-  "away_id": "dobrejovice",
-  "home_score": 4,
   "away_score": 1,
-  "date": "2025-08-23T17:00:00.000+02:00"
+  "half_home": 1,
+  "away_id": "dobrejovice",
+  "date": "2025-08-23T17:00:00.000+02:00",
+  "home_score": 4,
+  "played": true,
+  "location": "Pacov",
+  "half_away": 1,
+  "home_id": "pacov"
 }
