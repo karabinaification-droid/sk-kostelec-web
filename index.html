@@ -156,6 +156,7 @@
 
     <script>
         const REPO = 'karabinaification-droid/sk-kostelec-web';
+        const KOSTELEC_ID = 'kostelec';
         const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
         async function getGitHubData(path) {
@@ -209,7 +210,7 @@
             }
             allPosts.sort((a, b) => b.filename.localeCompare(a.filename));
             
-            // Render velkých novinek
+            // Render velkých novinek (featured)
             const featured = allPosts.filter(p => p.type === 'featured').slice(0, 3);
             document.getElementById('top-news-feed').innerHTML = featured.map(p => `
                 <div class="tn-card-wrapper" onclick="window.location.href='clanek.html?id=${p.filename}'">
@@ -224,8 +225,8 @@
                 </div>
             `).join('');
 
-            // Render feedu
-            const regular = allPosts.filter(p => !featured.includes(p)).slice(0, 5);
+            // Render běžného feedu
+            const regular = allPosts.filter(p => p.type !== 'featured').slice(0, 5);
             document.getElementById('news-feed').innerHTML = regular.map(p => `
                 <article class="article-row" onclick="window.location.href='clanek.html?id=${p.filename}'">
                     <div class="art-img" style="background-image: url('${p.image}')"></div>
@@ -233,7 +234,7 @@
                 </article>
             `).join('');
 
-            // 3. AUTOMATICKÝ PŘÍŠTÍ ZÁPAS
+            // 3. AUTOMATICKÝ PŘÍŠTÍ ZÁPAS (FILTROVÁN JEN NA KOSTELEC)
             const matchFiles = await getGitHubData('_data/matches');
             let matches = [];
             for (let f of matchFiles) {
@@ -241,17 +242,25 @@
                 if (m) matches.push(m);
             }
 
-            const upcoming = matches.filter(m => !m.played).sort((a, b) => new Date(a.date) - new Date(b.date))[0];
-            if (upcoming) {
-                const h = teamsMap[upcoming.home_id] || { title: upcoming.home_id, logo: 'logo-sk-kostelec.png' };
-                const a = teamsMap[upcoming.away_id] || { title: upcoming.away_id, logo: 'logo-sk-kostelec.png' };
+            // Filtr: Neodehrané zápasy, kde figuruje KOSTELEC_ID
+            const upcomingKostelec = matches
+                .filter(m => !m.played && (m.home_id === KOSTELEC_ID || m.away_id === KOSTELEC_ID))
+                .sort((a, b) => new Date(a.date) - new Date(b.date))[0];
+
+            if (upcomingKostelec) {
+                const h = teamsMap[upcomingKostelec.home_id] || { title: upcomingKostelec.home_id, logo: 'logo-sk-kostelec.png' };
+                const a = teamsMap[upcomingKostelec.away_id] || { title: upcomingKostelec.away_id, logo: 'logo-sk-kostelec.png' };
                 document.getElementById('nm-home-name').innerText = h.title;
                 document.getElementById('nm-away-name').innerText = a.title;
                 document.getElementById('nm-home-logo').src = h.logo;
                 document.getElementById('nm-away-logo').src = a.logo;
-                const d = new Date(upcoming.date);
+                const d = new Date(upcomingKostelec.date);
                 document.getElementById('nm-time').innerText = d.toLocaleTimeString('cs-CZ', {hour: '2-digit', minute:'2-digit'});
-                document.getElementById('nm-info').innerText = `${d.toLocaleDateString('cs-CZ')} | ${upcoming.location}`;
+                document.getElementById('nm-info').innerText = `${d.toLocaleDateString('cs-CZ')} | ${upcomingKostelec.location}`;
+            } else {
+                document.getElementById('nm-info').innerText = "Žádný naplánovaný zápas Kostelce";
+                document.getElementById('nm-home-name').innerText = "SK Kostelec";
+                document.getElementById('nm-away-name').innerText = "A-Tým";
             }
 
             // 4. AUTOMATICKÁ TABULKA
@@ -264,10 +273,12 @@
                 const h = stats[m.home_id], a = stats[m.away_id];
                 if (h && a) {
                     h.z++; a.z++;
-                    h.gf += parseInt(m.home_score); h.ga += parseInt(m.away_score);
-                    a.gf += parseInt(m.away_score); a.ga += parseInt(m.home_score);
-                    if (parseInt(m.home_score) > parseInt(m.away_score)) { h.v++; h.b += 3; a.p++; }
-                    else if (parseInt(m.home_score) < parseInt(m.away_score)) { a.v++; a.b += 3; h.p++; }
+                    const hs = parseInt(m.home_score || 0);
+                    const as = parseInt(m.away_score || 0);
+                    h.gf += hs; h.ga += as;
+                    a.gf += as; a.ga += hs;
+                    if (hs > as) { h.v++; h.b += 3; a.p++; }
+                    else if (hs < as) { a.v++; a.b += 3; h.p++; }
                     else { h.r++; a.r++; h.b += 1; a.b += 1; }
                 }
             });
