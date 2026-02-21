@@ -40,6 +40,7 @@
         
         <main class="club-content">
             <h2 class="main-title">Zápasy SK Kostelec</h2>
+            
             <div id="matches-container">
                 <p>Načítám kompletní rozpis a výsledky...</p>
             </div>
@@ -75,6 +76,7 @@
                     <h4>Kontakt</h4>
                     <p>Sportovní 752, 281 63 Kostelec nad Černými lesy</p>
                     <p>Email: skkostelec@seznam.cz</p>
+                    <p>Tel: +420 739 488 133 (předseda)</p>
                 </div>
             </div>
             <div class="footer-bottom">
@@ -86,13 +88,21 @@
     <button id="backToTop" title="Nahoru">↑</button>
 
     <script>
-        const IS_LOCAL = true; 
+        const REPO = 'karabinaification-droid/sk-kostelec-web';
         const KOSTELEC_ID = 'kostelec';
+        const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-        // Pomocná funkce pro načítání souborů
-        async function fetchFile(path) {
+        async function getGitHubData(path) {
             try {
-                const res = await fetch(path);
+                const url = `https://api.github.com/repos/${REPO}/contents/${path}`;
+                const res = await fetch(url);
+                return res.ok ? await res.json() : [];
+            } catch (e) { return []; }
+        }
+
+        async function fetchJSON(url) {
+            try {
+                const res = await fetch(url);
                 return res.ok ? await res.json() : null;
             } catch (e) { return null; }
         }
@@ -101,116 +111,83 @@
             const container = document.getElementById('matches-container');
             
             try {
-                // 1. Načtení týmů pro názvy a loga
-                const teamFiles = ['kostelec.json', 'pacov.json', 'cestlice.json', 'lounovice.json', 'mukarov.json', 'svojetice.json', 'dobrejovice.json', 'krizky.json', 'ondrejov.json', 'kunice.json', 'mirosovice.json', 'mnichovice.json', 'kamenice.json', 'skalice.json'];
-                let teams = {};
+                // 1. NAČTENÍ TÝMŮ PRO MAPOVÁNÍ ID -> NÁZEV/LOGO
+                const teamFiles = await getGitHubData('_data/teams');
+                let teamsMap = {};
                 for (let f of teamFiles) {
-                    const t = await fetchFile(`./_data/teams/${f}`);
-                    if (t) teams[t.id] = t;
+                    const t = await fetchJSON(IS_LOCAL ? `./_data/teams/${f.name}` : f.download_url);
+                    if (t) teamsMap[t.id] = t;
                 }
 
-                // 2. Načtení všech zápasů
-                const matchFiles = ['match-2026-02-20.json', 'match-2026-02-21.json', 'match-2026-03-01.json'];
-                let matches = [];
+                // 2. NAČTENÍ VŠECH ZÁPASŮ
+                const matchFiles = await getGitHubData('_data/matches');
+                let allMatches = [];
                 for (let f of matchFiles) {
-                    const m = await fetchFile(`./_data/matches/${f}`);
-                    if (m) matches.push(m);
+                    const m = await fetchJSON(IS_LOCAL ? `./_data/matches/${f.name}` : f.download_url);
+                    if (m) allMatches.push(m);
                 }
 
-                // Filtrovat zápasy Kostelce a seřadit je od nejnovějšího (odehrané nahoře)
-                const kostelecMatches = matches
+                // 3. FILTRACE ZÁPASŮ KOSTELCE A SEŘAZENÍ (OD NEJNOVĚJŠÍHO)
+                const kostelecMatches = allMatches
                     .filter(m => m.home_id === KOSTELEC_ID || m.away_id === KOSTELEC_ID)
                     .sort((a, b) => new Date(b.date) - new Date(a.date));
 
-                // Najít příští zápas (nejbližší budoucí, který se ještě nehrál)
-                const upcoming = matches
-                    .filter(m => !m.played && (m.home_id === KOSTELEC_ID || m.away_id === KOSTELEC_ID))
-                    .sort((a, b) => new Date(a.date) - new Date(b.date))[0];
-
-                let html = '';
-
-                // Pokud existuje příští zápas, vykreslíme ho jako první (zvýrazněný)
-                if (upcoming) {
-                    const hTeam = teams[upcoming.home_id];
-                    const aTeam = teams[upcoming.away_id];
-                    const d = new Date(upcoming.date);
-                    
-                    html += `
-                        <div class="match-row upcoming">
-                            <div class="match-meta">
-                                <span class="m-date">${d.toLocaleDateString('cs-CZ')} | ${d.toLocaleTimeString('cs-CZ', {hour: '2-digit', minute:'2-digit'})}</span>
-                                <span class="m-badge">PŘÍŠTÍ ZÁPAS</span>
-                            </div>
-                            <div class="match-main">
-                                <div class="m-team home">
-                                    <span class="team-name">${hTeam ? hTeam.title : upcoming.home_id}</span>
-                                    <img src="${hTeam ? hTeam.logo : 'logo-sk-kostelec.png'}" class="m-logo">
-                                </div>
-                                <div class="m-score upcoming">VS</div>
-                                <div class="m-team away">
-                                    <img src="${aTeam ? aTeam.logo : 'logo-sk-kostelec.png'}" class="m-logo">
-                                    <span class="team-name">${aTeam ? aTeam.title : upcoming.away_id}</span>
-                                </div>
-                            </div>
-                            <div style="text-align:center; font-size: 0.9rem; color: #666; margin-top: 10px;">
-                                Místo: ${upcoming.location || 'Bude upřesněno'}
-                            </div>
-                        </div>
-                        <h3 style="margin: 40px 0 20px; text-transform: uppercase; font-family: 'Oswald';">Odehraná utkání</h3>
-                    `;
+                if (kostelecMatches.length === 0) {
+                    container.innerHTML = '<p>Žádné zápasy nebyly nalezeny.</p>';
+                    return;
                 }
 
-                // Vykreslení odehraných zápasů
-                html += kostelecMatches.filter(m => m.played).map(m => {
-                    const hTeam = teams[m.home_id] || { title: m.home_id, logo: "" };
-                    const aTeam = teams[m.away_id] || { title: m.away_id, logo: "" };
+                container.innerHTML = kostelecMatches.map(m => {
+                    const hTeam = teamsMap[m.home_id] || { title: m.home_id, logo: "logo-sk-kostelec.png" };
+                    const aTeam = teamsMap[m.away_id] || { title: m.away_id, logo: "logo-sk-kostelec.png" };
                     const d = new Date(m.date);
                     
-                    // Barvení výsledku
-                    let scoreClass = '';
-                    const isHome = m.home_id === KOSTELEC_ID;
-                    if (m.home_score > m.away_score) scoreClass = isHome ? 'win' : 'loss';
-                    else if (m.home_score < m.away_score) scoreClass = isHome ? 'loss' : 'win';
-
-                    // Zpracování střelců
-                    let scorersHtml = '';
-                    if (m.scorers && m.scorers.length > 0) {
-                        scorersHtml = `<div class="m-scorers">⚽ Střelci: ${m.scorers.join(', ')}</div>`;
+                    // Logika barev skóre pro Kostelec
+                    let resultClass = '';
+                    if (m.played) {
+                        const isHome = m.home_id === KOSTELEC_ID;
+                        const scoreHome = parseInt(m.home_score);
+                        const scoreAway = parseInt(m.away_score);
+                        
+                        if (scoreHome === scoreAway) resultClass = ''; // remíza
+                        else if (scoreHome > scoreAway) resultClass = isHome ? 'win' : 'loss';
+                        else resultClass = isHome ? 'loss' : 'win';
                     }
 
                     return `
-                        <div class="match-row">
+                        <div class="match-row ${!m.played ? 'upcoming' : ''}">
                             <div class="match-meta">
-                                <span class="m-date">${d.toLocaleDateString('cs-CZ')}</span>
-                                <span class="m-info">A-Třída | Poločas (${m.half_home}:${m.half_away})</span>
+                                <span class="m-date">${d.toLocaleDateString('cs-CZ')} ${!m.played ? '| ' + d.toLocaleTimeString('cs-CZ', {hour: '2-digit', minute:'2-digit'}) : ''}</span>
+                                <span class="m-badge">${!m.played ? 'PŘÍŠTÍ' : 'VÝSLEDEK'}</span>
                             </div>
                             <div class="match-main">
                                 <div class="m-team home">
                                     <span class="team-name">${hTeam.title}</span>
                                     <img src="${hTeam.logo}" class="m-logo">
                                 </div>
-                                <div class="m-score ${scoreClass}">${m.home_score}:${m.away_score}</div>
+                                <div class="m-score ${resultClass}">
+                                    ${m.played ? `${m.home_score}:${m.away_score}` : 'VS'}
+                                </div>
                                 <div class="m-team away">
                                     <img src="${aTeam.logo}" class="m-logo">
                                     <span class="team-name">${aTeam.title}</span>
                                 </div>
                             </div>
-                            ${scorersHtml}
+                            ${m.played && m.half_home !== undefined ? `<div style="text-align:center; font-size:0.8rem; color:#777; margin-bottom:10px;">Poločas (${m.half_home}:${m.half_away})</div>` : ''}
+                            ${m.scorers && m.scorers.length > 0 ? `<div class="m-scorers">⚽ Střelci: ${m.scorers.join(', ')}</div>` : ''}
                         </div>
                     `;
                 }).join('');
 
-                container.innerHTML = html;
-
             } catch(e) {
                 console.error(e);
-                container.innerHTML = '<p>Data zápasů se nepodařilo načíst.</p>';
+                container.innerHTML = '<p>Chyba při načítání dat.</p>';
             }
         }
 
         initMatches();
 
-        // UI logiky pro menu
+        // UI Funkce (Menu)
         const menuToggle = document.querySelector('.menu-toggle');
         const navLinks = document.querySelector('.nav-links');
         if (menuToggle) {
@@ -219,7 +196,8 @@
                 navLinks.classList.toggle('active');
             });
         }
-        
+
+        // Back to top
         const btt = document.getElementById("backToTop");
         window.onscroll = function() {
             if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) { btt.style.display = "block"; } else { btt.style.display = "none"; }
