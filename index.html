@@ -77,20 +77,20 @@
 
     <main class="main-container">
         <section class="karvina-box" id="next-match-box">
-            <div class="kb-team" id="nm-home-name">Pauza</div>
+            <div class="kb-team" id="nm-home-name">Načítám...</div>
             <img src="logo-sk-kostelec.png" id="nm-home-logo" class="kb-logo">
             <div class="kb-center">
                 <div class="kb-label">Příští utkání</div>
                 <div class="kb-time" id="nm-time">--:--</div>
-                <div class="kb-info" id="nm-info">Žádný naplánovaný zápas</div>
+                <div class="kb-info" id="nm-info">Hledám zápas...</div>
             </div>
             <img src="logo-sk-kostelec.png" id="nm-away-logo" class="kb-logo">
-            <div class="kb-team" id="nm-away-name">Pauza</div>
+            <div class="kb-team" id="nm-away-name">Načítám...</div>
         </section>
 
         <div class="content-layout">
             <section class="news-section">
-                <h2 class="section-title">Krátké zprávy</h2>
+                <h2 class="section-title">Nejnovější zprávy</h2>
                 <div id="news-feed"></div>
             </section>
 
@@ -106,7 +106,7 @@
                                     <th>Z</th><th>V</th><th>R</th><th>P</th><th>Skóre</th><th>B</th>
                                 </tr>
                             </thead>
-                            <tbody id="auto-league-table"><tr><td colspan="8">Počítám tabulku...</td></tr></tbody>
+                            <tbody id="auto-league-table"><tr><td colspan="8">Načítám tabulku...</td></tr></tbody>
                         </table>
                     </div>
                 </div>
@@ -134,16 +134,15 @@
                     <h4>Navigace</h4>
                     <ul>
                         <li><a href="index.html">Aktuality</a></li>
-                        <li><a href="soupiska.html">A-Tým (Soupiska)</a></li>
-                        <li><a href="klub.html">O Klubu & Historie</a></li>
-                        <li><a href="kontakt.html">Kontakt & Mapa</a></li>
+                        <li><a href="soupiska.html">A-Tým</a></li>
+                        <li><a href="klub.html">Klub</a></li>
+                        <li><a href="kontakt.html">Kontakt</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
                     <h4>Kontakt</h4>
                     <p><strong>Adresa:</strong> Sportovní 752, 281 63 Kostelec nad Černými lesy</p>
                     <p><strong>Email:</strong> skkostelec@seznam.cz</p>
-                    <p><strong>Tel:</strong> +420 739 488 133 (předseda)</p>
                 </div>
             </div>
             <div class="footer-bottom">
@@ -155,44 +154,42 @@
     <button id="backToTop" title="Nahoru">↑</button>
 
     <script>
-        const IS_LOCAL = true; 
-        
-        // Pomocná funkce pro načítání JSONů a MD souborů
-        async function fetchData(path) {
+        const REPO = 'karabinaification-droid/sk-kostelec-web';
+        const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+        async function getGitHubData(path) {
             try {
-                const res = await fetch(path);
+                const url = `https://api.github.com/repos/${REPO}/contents/${path}`;
+                const res = await fetch(url);
+                return res.ok ? await res.json() : [];
+            } catch (e) { return []; }
+        }
+
+        async function fetchJSON(url) {
+            try {
+                const res = await fetch(url);
                 return res.ok ? await res.json() : null;
             } catch (e) { return null; }
         }
 
         async function init() {
-            await loadNewsAndFeatured();
+            await loadNews();
             await autoNextMatch();
             await generateAutoTable();
         }
 
-        // 1. NAČÍTÁNÍ NOVINEK (TOP 3) A AKTUALIT
-        async function loadNewsAndFeatured() {
-            const newsFeed = document.getElementById('news-feed');
+        // 1. AUTOMATICKÉ NOVINKY
+        async function loadNews() {
+            const feed = document.getElementById('news-feed');
             const topFeed = document.getElementById('top-news-feed');
-            
-            // Seznam souborů (v produkci bys mohl načítat přes API GitHubu nebo seznam)
-            const postFiles = [
-                '2026-02-20-historicky-postup.md',
-                '2026-02-20-u15-mistri.md',
-                '2026-02-20-nove-hriste-3.md',
-                '2026-02-20-mládež-již-v-zimní-přípravě.md',
-                '2026-02-20-mladší-žáci-na-domácí-zimní-lize-bronzoví.md'
-            ];
+            try {
+                const files = await getGitHubData('_posts');
+                const allPosts = [];
 
-            let allPosts = [];
-
-            for (const file of postFiles) {
-                try {
-                    const res = await fetch(`./_posts/${file}`);
-                    if (!res.ok) continue;
-                    const raw = await res.text();
-                    
+                for (const file of files) {
+                    const r = await fetch(IS_LOCAL ? `./_posts/${file.name}` : file.download_url);
+                    if(!r.ok) continue;
+                    const raw = await r.text();
                     const metaPart = raw.split('---')[1];
                     const contentPart = raw.split('---')[2] || "";
                     
@@ -202,77 +199,70 @@
                         return match ? match[1].trim() : null;
                     };
 
-                    allPosts.push({
-                        filename: file,
+                    const post = {
+                        filename: file.name,
                         title: getMeta('title'),
-                        type: getMeta('type'), // news-feed nebo featured
+                        type: getMeta('type'),
                         image: getMeta('image') || 'logo-sk-kostelec.png',
-                        date: getMeta('date'),
-                        description: contentPart.replace(/[#*`]/g, '').substring(0, 120).trim() + '...'
-                    });
-                } catch(e) {}
-            }
+                        date: getMeta('date') || "20. února 2026",
+                        description: contentPart.replace(/[#*`]/g, '').substring(0, 150).trim() + '...'
+                    };
+                    if (post.title) allPosts.push(post);
+                }
 
-            // Seřadit podle data (předpokládáme formát v názvu souboru)
-            allPosts.sort((a, b) => b.filename.localeCompare(a.filename));
+                allPosts.sort((a, b) => b.filename.localeCompare(a.filename));
+                const featured = allPosts.filter(p => p.type === 'featured').slice(0, 3);
+                const regular = allPosts.filter(p => p.type !== 'featured').slice(0, 5);
 
-            // Rozdělení na Top 3 a zbytek
-            const featured = allPosts.filter(p => p.type === 'featured').slice(0, 3);
-            const feed = allPosts.filter(p => p.type !== 'featured').slice(0, 5);
-
-            topFeed.innerHTML = featured.map(p => `
-                <div class="tn-card-wrapper" onclick="window.location.href='clanek.html?id=${p.filename}'">
-                    <div class="top-news-card" style="background-image: url('${p.image}')">
-                        <div class="tn-overlay">
-                            <div class="tn-content">
-                                <span class="tn-date">${new Date(p.date).toLocaleDateString('cs-CZ')}</span>
-                                <h3 class="tn-title">${p.title}</h3>
-                                <p class="tn-excerpt">${p.description}</p>
+                topFeed.innerHTML = featured.map(p => `
+                    <div class="tn-card-wrapper" onclick="window.location.href='clanek.html?id=${p.filename}'">
+                        <div class="top-news-card" style="background-image: url('${p.image}')">
+                            <div class="tn-overlay">
+                                <div class="tn-content">
+                                    <h3 class="tn-title">${p.title}</h3>
+                                    <p class="tn-excerpt">${p.description}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                `).join('');
 
-            newsFeed.innerHTML = feed.map(p => `
-                <article class="article-row" style="cursor:pointer" onclick="window.location.href='clanek.html?id=${p.filename}'">
-                    <div class="art-img" style="background-image: url('${p.image}')"></div>
-                    <div class="art-text">
-                        <h3>${p.title}</h3>
-                    </div>
-                </article>
-            `).join('');
+                feed.innerHTML = regular.map(p => `
+                    <article class="article-row" style="cursor:pointer" onclick="window.location.href='clanek.html?id=${p.filename}'">
+                        <div class="art-img" style="background-image: url('${p.image}')"></div>
+                        <div class="art-text"><h3>${p.title}</h3></div>
+                    </article>
+                `).join('');
+            } catch(e) { console.error(e); }
         }
 
         // 2. AUTOMATICKÝ PŘÍŠTÍ ZÁPAS
         async function autoNextMatch() {
             try {
-                // Tady by ideálně byl seznam všech zápasů
-                const matchFiles = ['match-2026-03-01.json', 'match-2026-03-08.json']; 
+                const matchFiles = await getGitHubData('_data/matches');
                 let matches = [];
-                
-                for (const f of matchFiles) {
-                    const m = await fetchData(`./_data/matches/${f}`);
+                for (let f of matchFiles) {
+                    const m = await fetchJSON(IS_LOCAL ? `./_data/matches/${f.name}` : f.download_url);
                     if (m && !m.played) matches.push(m);
                 }
 
                 if (matches.length > 0) {
-                    // Najít nejbližší
                     matches.sort((a, b) => new Date(a.date) - new Date(b.date));
                     const next = matches[0];
                     
-                    // Načíst loga z adresáře týmů
-                    const homeTeam = await fetchData(`./_data/teams/${next.home_id}.json`);
-                    const awayTeam = await fetchData(`./_data/teams/${next.away_id}.json`);
+                    const hTeam = await fetchJSON(IS_LOCAL ? `./_data/teams/${next.home_id}.json` : `https://raw.githubusercontent.com/${REPO}/main/_data/teams/${next.home_id}.json`);
+                    const aTeam = await fetchJSON(IS_LOCAL ? `./_data/teams/${next.away_id}.json` : `https://raw.githubusercontent.com/${REPO}/main/_data/teams/${next.away_id}.json`);
 
-                    document.getElementById('nm-home-name').innerText = homeTeam ? homeTeam.title : next.home_id;
-                    document.getElementById('nm-away-name').innerText = awayTeam ? awayTeam.title : next.away_id;
-                    document.getElementById('nm-home-logo').src = homeTeam ? homeTeam.logo : 'logo-sk-kostelec.png';
-                    document.getElementById('nm-away-logo').src = awayTeam ? awayTeam.logo : 'logo-sk-kostelec.png';
+                    document.getElementById('nm-home-name').innerText = hTeam ? hTeam.title : next.home_id;
+                    document.getElementById('nm-away-name').innerText = aTeam ? aTeam.title : next.away_id;
+                    document.getElementById('nm-home-logo').src = hTeam ? hTeam.logo : 'logo-sk-kostelec.png';
+                    document.getElementById('nm-away-logo').src = aTeam ? aTeam.logo : 'logo-sk-kostelec.png';
                     
                     const d = new Date(next.date);
                     document.getElementById('nm-time').innerText = d.toLocaleTimeString('cs-CZ', {hour: '2-digit', minute:'2-digit'});
                     document.getElementById('nm-info').innerText = `${d.toLocaleDateString('cs-CZ')} | ${next.location}`;
+                } else {
+                    document.getElementById('nm-info').innerText = "Žádný naplánovaný zápas";
                 }
             } catch(e) {}
         }
@@ -281,50 +271,37 @@
         async function generateAutoTable() {
             const tb = document.getElementById('auto-league-table');
             try {
-                // Načíst všechny týmy pro loga a názvy
-                const teamIDs = ['kostelec', 'pacov', 'karvina', 'kamenice']; // Dynamicky bys načetl složku
+                const teamFiles = await getGitHubData('_data/teams');
                 let stats = {};
-                
-                for (const id of teamIDs) {
-                    const t = await fetchData(`./_data/teams/${id}.json`);
-                    if (t) stats[id] = { title: t.title, logo: t.logo, z:0, v:0, r:0, p:0, gf:0, ga:0, b:0 };
+                for (const file of teamFiles) {
+                    const t = await fetchJSON(IS_LOCAL ? `./_data/teams/${file.name}` : file.download_url);
+                    if (t) stats[t.id] = { title: t.title, logo: t.logo, z: 0, v: 0, r: 0, p: 0, gf: 0, ga: 0, b: 0 };
                 }
 
-                // Načíst všechny odehrané zápasy
-                const matchFiles = ['match-2026-02-20.json']; // Seznam souborů v _data/matches
-                for (const f of matchFiles) {
-                    const m = await fetchData(`./_data/matches/${f}`);
-                    if (m && m.played) {
+                const matchFiles = await getGitHubData('_data/matches');
+                for (const file of matchFiles) {
+                    const m = await fetchJSON(IS_LOCAL ? `./_data/matches/${file.name}` : file.download_url);
+                    if (m && m.played && stats[m.home_id] && stats[m.away_id]) {
                         const h = stats[m.home_id], a = stats[m.away_id];
-                        if (h && a) {
-                            h.z++; a.z++;
-                            h.gf += m.home_score; h.ga += m.away_score;
-                            a.gf += m.away_score; a.ga += m.home_score;
-                            if (m.home_score > m.away_score) { h.v++; h.b += 3; a.p++; }
-                            else if (m.home_score < m.away_score) { a.v++; a.b += 3; h.p++; }
-                            else { h.r++; a.r++; h.b += 1; a.b += 1; }
-                        }
+                        h.z++; a.z++;
+                        h.gf += parseInt(m.home_score); h.ga += parseInt(m.away_score);
+                        a.gf += parseInt(m.away_score); a.ga += parseInt(m.home_score);
+                        if (parseInt(m.home_score) > parseInt(m.away_score)) { h.v++; h.b += 3; a.p++; }
+                        else if (parseInt(m.home_score) < parseInt(m.away_score)) { a.v++; a.b += 3; h.p++; }
+                        else { h.r++; a.r++; h.b += 1; a.b += 1; }
                     }
                 }
 
                 const sorted = Object.values(stats).sort((a,b) => b.b - a.b || (b.gf-b.ga)-(a.gf-a.ga));
-                tb.innerHTML = sorted.map((t, i) => {
-                    const isK = t.title.includes("Kostelec") ? 'class="highlight-kostelec"' : '';
+                tb.innerHTML = sorted.slice(0, 14).map((t, i) => {
+                    const isK = t.title.toLowerCase().includes("kostelec") && !t.title.toLowerCase().includes("křížků") ? 'class="highlight-kostelec"' : '';
                     return `<tr ${isK}><td>${i+1}.</td><td style="text-align:left"><img src="${t.logo}">${t.title}</td><td>${t.z}</td><td>${t.v}</td><td>${t.r}</td><td>${t.p}</td><td>${t.gf}:${t.ga}</td><td>${t.b}</td></tr>`;
                 }).join('');
-
-            } catch(e) { tb.innerHTML = 'Tabulka není k dispozici.'; }
+            } catch(e) { tb.innerHTML = 'Chyba načítání.'; }
         }
         
         init();
 
-        // UI FUNKCE
-        const btt = document.getElementById("backToTop");
-        window.onscroll = function() {
-            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) { btt.style.display = "block"; } else { btt.style.display = "none"; }
-        };
-        btt.onclick = function() { window.scrollTo({ top: 0, behavior: 'smooth' }); };
-        
         const menuToggle = document.querySelector('.menu-toggle');
         const navLinks = document.querySelector('.nav-links');
         menuToggle.addEventListener('click', () => {

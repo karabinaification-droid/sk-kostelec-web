@@ -56,7 +56,7 @@
                         </tr>
                     </thead>
                     <tbody id="league-table-body">
-                        <tr><td colspan="9">Počítám aktuální tabulku...</td></tr>
+                        <tr><td colspan="9">Načítám data z GitHubu...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -69,7 +69,6 @@
                     <div class="legend-item"><strong>R</strong> Remízy</div>
                     <div class="legend-item"><strong>P</strong> Prohry</div>
                     <div class="legend-item"><strong>Skóre</strong> Vstřelené : Obdržené góly</div>
-                    <div class="legend-item"><strong>Rozdíl</strong> Rozdíl ve skóre</div>
                     <div class="legend-item"><strong>B</strong> Celkový počet bodů</div>
                 </div>
             </div>
@@ -116,24 +115,34 @@
     <button id="backToTop" title="Nahoru">↑</button>
 
     <script>
-        // Nastavení - seznam souborů pro simulaci složek na lokálu
-        const TEAM_FILES = ['kostelec.json', 'pacov.json', 'cestlice.json', 'lounovice.json', 'mukarov.json', 'svojetice.json', 'dobrejovice.json', 'krizky.json', 'ondrejov.json', 'kunice.json', 'mirosovice.json', 'mnichovice.json', 'kamenice.json', 'skalice.json'];
-        const MATCH_FILES = ['match-2026-02-20.json', 'match-2026-02-21.json']; // Zde budou přibývat soubory z adminu
+        const REPO = 'karabinaification-droid/sk-kostelec-web'; // Tvůj repozitář
+        const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-        async function init() {
-            await generateLeagueTable();
+        async function getGitHubData(path) {
+            try {
+                const url = `https://api.github.com/repos/${REPO}/contents/${path}`;
+                const res = await fetch(url);
+                return res.ok ? await res.json() : [];
+            } catch (e) { return []; }
         }
 
-        async function generateLeagueTable() {
+        async function fetchJSON(url) {
+            try {
+                const res = await fetch(url);
+                return res.ok ? await res.json() : null;
+            } catch (e) { return null; }
+        }
+
+        async function init() {
             const tableBody = document.getElementById('league-table-body');
             try {
+                // 1. Načtení týmů (pro názvy a loga)
+                const teamFiles = await getGitHubData('_data/teams');
                 let stats = {};
 
-                // 1. Načtení týmů
-                for (const file of TEAM_FILES) {
-                    const res = await fetch(`./_data/teams/${file}`);
-                    if (res.ok) {
-                        const t = await res.json();
+                for (const file of teamFiles) {
+                    const t = await fetchJSON(IS_LOCAL ? `./_data/teams/${file.name}` : file.download_url);
+                    if (t && t.id) {
                         stats[t.id] = { 
                             title: t.title, 
                             logo: t.logo, 
@@ -142,34 +151,33 @@
                     }
                 }
 
-                // 2. Načtení odehraných zápasů a výpočet bodů
-                for (const file of MATCH_FILES) {
-                    const res = await fetch(`./_data/matches/${file}`);
-                    if (res.ok) {
-                        const m = await res.json();
-                        // Počítáme jen odehrané zápasy s vyplněným skóre
-                        if (m.played && stats[m.home_id] && stats[m.away_id]) {
-                            const h = stats[m.home_id];
-                            const a = stats[m.away_id];
+                // 2. Načtení VŠECH zápasů ze složky
+                const matchFiles = await getGitHubData('_data/matches');
+                for (const file of matchFiles) {
+                    const m = await fetchJSON(IS_LOCAL ? `./_data/matches/${file.name}` : file.download_url);
+                    
+                    // Zpracujeme jen odehrané zápasy (played: true)
+                    if (m && m.played && stats[m.home_id] && stats[m.away_id]) {
+                        const h = stats[m.home_id];
+                        const a = stats[m.away_id];
 
-                            h.z++; a.z++;
-                            h.gf += parseInt(m.home_score);
-                            h.ga += parseInt(m.away_score);
-                            a.gf += parseInt(m.away_score);
-                            a.ga += parseInt(m.home_score);
+                        h.z++; a.z++;
+                        h.gf += parseInt(m.home_score || 0);
+                        h.ga += parseInt(m.away_score || 0);
+                        a.gf += parseInt(m.away_score || 0);
+                        a.ga += parseInt(m.home_score || 0);
 
-                            if (parseInt(m.home_score) > parseInt(m.away_score)) {
-                                h.v++; h.b += 3; a.p++;
-                            } else if (parseInt(m.home_score) < parseInt(m.away_score)) {
-                                a.v++; a.b += 3; h.p++;
-                            } else {
-                                h.r++; a.r++; h.b += 1; a.b += 1;
-                            }
+                        if (parseInt(m.home_score) > parseInt(m.away_score)) {
+                            h.v++; h.b += 3; a.p++;
+                        } else if (parseInt(m.home_score) < parseInt(m.away_score)) {
+                            a.v++; a.b += 3; h.p++;
+                        } else {
+                            h.r++; a.r++; h.b += 1; a.b += 1;
                         }
                     }
                 }
 
-                // 3. Seřazení (body -> rozdíl skóre -> vstřelené góly)
+                // 3. Seřazení tabulky (body -> rozdíl skóre -> vstřelené góly)
                 const sorted = Object.values(stats).sort((a, b) => {
                     if (b.b !== a.b) return b.b - a.b;
                     const diffA = a.gf - a.ga;
@@ -179,16 +187,21 @@
                 });
 
                 // 4. Vykreslení
+                if (sorted.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="9">Žádná data týmů nenalezena.</td></tr>';
+                    return;
+                }
+
                 tableBody.innerHTML = sorted.map((row, i) => {
                     const diff = row.gf - row.ga;
-                    const isKostelec = row.title.includes("SK Kostelec nad Černými lesy");
+                    const isKostelec = row.title.toLowerCase().includes("kostelec") && !row.title.toLowerCase().includes("křížků");
                     
                     return `
                         <tr class="${isKostelec ? 'highlight-me' : ''}">
                             <td class="col-rank">${i + 1}.</td>
                             <td style="text-align:left">
                                 <div class="team-info" style="display:flex; align-items:center; gap:10px;">
-                                    <img src="${row.logo}" alt="" class="team-logo" style="width:25px; height:25px; object-fit:contain;">
+                                    <img src="${row.logo}" alt="" style="width:25px; height:25px; object-fit:contain;">
                                     <span class="team-name">${row.title}</span>
                                 </div>
                             </td>
@@ -205,7 +218,7 @@
 
             } catch (e) {
                 console.error(e);
-                tableBody.innerHTML = '<tr><td colspan="9">Chyba při načítání dat.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="9">Chyba při komunikaci s GitHubem.</td></tr>';
             }
         }
 
@@ -220,12 +233,6 @@
                 navLinks.classList.toggle('active');
             });
         }
-        
-        const btt = document.getElementById("backToTop");
-        window.onscroll = function() {
-            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) { btt.style.display = "block"; } else { btt.style.display = "none"; }
-        };
-        btt.onclick = function() { window.scrollTo({ top: 0, behavior: 'smooth' }); };
     </script>
 </body>
 </html>
