@@ -11,6 +11,7 @@ collections:
   - name: "blog"
     label: "Aktuality a Novinky"
     folder: "_posts"
+    summary: "{{title}} ({{date}})"
     create: true
     slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
     fields:
@@ -28,6 +29,7 @@ collections:
   - name: "teams"
     label: "1. Adresář týmů (Loga)"
     folder: "_data/teams"
+    summary: "{{title}} ({{id}})"
     create: true
     extension: "json"
     format: "json"
@@ -42,6 +44,7 @@ collections:
   - name: "matches"
     label: "2. Zápasy (Rozpis a Výsledky)"
     folder: "_data/matches"
+    summary: "{{home_id}} vs {{away_id}} | {{home_score}}:{{away_score}} ({{date}})"
     create: true
     extension: "json"
     format: "json"
@@ -82,13 +85,14 @@ collections:
           widget: "relation"
           collection: "players"
           search_fields: ["title"]
-          value_field: "title" # Propojení přes jméno pro statistiky
+          value_field: "title" 
           display_fields: ["title"]
 
   # 4. SOUPISKA
   - name: "players"
     label: "3. Soupiska A-Tým"
     folder: "_data/players"
+    summary: "#{{number}} {{title}} ({{position}})"
     create: true
     extension: "json"
     format: "json"
